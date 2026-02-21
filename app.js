@@ -174,10 +174,11 @@
     var ltc = (i.currentLandValue + i.constructionCost) > 0 ? ((i.amountFinanced / (i.currentLandValue + i.constructionCost)) * 100) : null;
     var dcr = i.amountFinanced > 0 ? (i.gdv / i.amountFinanced) : null;
 
-    byId('netSalesRevenue').textContent = formatCurrency(i.netSalesRevenue);
+    if (byId('netSalesRevenue')) byId('netSalesRevenue').textContent = formatCurrency(i.netSalesRevenue);
     byId('startingValue').textContent = formatCurrency(i.currentLandValue);
     byId('endValue').textContent = formatCurrency(i.totalGRV);
     byId('gdv').textContent = formatCurrency(i.gdv);
+    if (byId('summaryGdv')) byId('summaryGdv').textContent = formatCurrency(i.gdv);
     byId('rlv').textContent = formatCurrency(rlv);
     
     // RLV feasibility check and hint update
@@ -446,27 +447,6 @@
   }
 
   // Expandable sections
-  var advancedCostsToggle = byId('advancedCostsToggle');
-  var advancedCostsContent = byId('advancedCostsContent');
-  
-  if (advancedCostsToggle && advancedCostsContent) {
-    // Set initial state to expanded
-    advancedCostsToggle.setAttribute('aria-expanded', 'true');
-    advancedCostsContent.style.display = 'block';
-    if (advancedCostsToggle.querySelector('.toggle-icon')) {
-      advancedCostsToggle.querySelector('.toggle-icon').style.transform = 'rotate(180deg)';
-    }
-    
-    advancedCostsToggle.addEventListener('click', function() {
-      var isExpanded = advancedCostsToggle.getAttribute('aria-expanded') === 'true';
-      advancedCostsContent.style.display = isExpanded ? 'none' : 'block';
-      advancedCostsToggle.setAttribute('aria-expanded', !isExpanded);
-      if (advancedCostsToggle.querySelector('.toggle-icon')) {
-        advancedCostsToggle.querySelector('.toggle-icon').style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
-      }
-    });
-  }
-
   var resultsDetailsToggle = byId('resultsDetailsToggle');
   var resultsDetailsContent = byId('resultsDetailsContent');
   
@@ -503,16 +483,25 @@
       var el = document.getElementById(id);
       if (!el) return '';
       var text = el.textContent.trim();
-      // Clean up currency values - remove extra spaces between digits
-      // Replace patterns like "$ 3 , 0 0 0" with "$3,000"
-      text = text.replace(/\$\s*([\d\s,]+)/g, function(match, digits) {
-        var cleaned = digits.replace(/\s+/g, '');
-        return '$' + cleaned;
+      // Use ASCII minus so PDF font renders correctly (Unicode − can render as " in jsPDF)
+      text = text.replace(/\u2212/g, '-');
+      text = text.replace(/[\u2010-\u2015\u2796]/g, '-');
+      text = text.replace(/"/g, '');
+      // Normalise currency: remove spaces in numbers, keep one comma-separated format
+      function formatNumPart(s) {
+        var digits = s.replace(/[\s,$]/g, '');
+        if (!digits) return s;
+        var n = parseInt(digits, 10);
+        if (isNaN(n)) return s;
+        return n.toLocaleString('en-AU');
+      }
+      // Negative amount: - $ x , x x x -> -$x,xxx
+      text = text.replace(/-\s*\$\s*([\d\s,]+)/g, function(_, d) {
+        return '-$' + formatNumPart(d);
       });
-      // Also handle negative values with minus sign
-      text = text.replace(/−\s*\$?\s*([\d\s,]+)/g, function(match, digits) {
-        var cleaned = digits.replace(/\s+/g, '');
-        return '−$' + cleaned;
+      // Positive amount: $ x , x x x -> $x,xxx
+      text = text.replace(/\$\s*([\d\s,]+)/g, function(_, d) {
+        return '$' + formatNumPart(d);
       });
       return text;
     }
@@ -545,17 +534,24 @@
     }
 
     function runAutoTable(doc, opts) {
-      // Set default font settings for consistency
       if (!opts.styles) opts.styles = {};
       opts.styles.font = 'helvetica';
       opts.styles.fontSize = opts.styles.fontSize || 9;
       opts.styles.cellPadding = opts.styles.cellPadding || 3;
       opts.styles.overflow = 'linebreak';
-      opts.styles.cellWidth = 'wrap';
-      
-      // Ensure consistent column widths
+      if (!opts.tableWidth) opts.tableWidth = CONTENT_WIDTH;
       if (!opts.columnStyles) opts.columnStyles = {};
-      
+      // Align header cells with their column so "Value", "Gross Sales", "RLV", "Amount" match right-aligned values
+      var existingDidParseCell = opts.didParseCell;
+      opts.didParseCell = function(data) {
+        if (data.section === 'head') {
+          var colStyle = opts.columnStyles[data.column.index];
+          if (colStyle && colStyle.halign) {
+            data.cell.styles.halign = colStyle.halign;
+          }
+        }
+        if (existingDidParseCell) existingDidParseCell(data);
+      };
       if (typeof doc.autoTable === 'function') {
         doc.autoTable(opts);
       } else if (window.jspdf && typeof window.jspdf.autoTable === 'function') {
@@ -615,7 +611,8 @@
       head: [['Metric', 'Value']],
       body: [
         ['Current Market Value (As-Is)', val('startingValue')],
-        ['On-Completion Value (As-Complete)', val('endValue')]
+        ['On-Completion Value (As-Complete)', val('endValue')],
+        ['Gross Sales', val('gdv')]
       ],
       theme: 'plain',
       headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
@@ -688,49 +685,49 @@
     
     // Add construction cost
     var constructionVal = val('b-construction');
-    if (constructionVal && constructionVal !== '$0' && constructionVal !== '−$0') {
+    if (constructionVal && constructionVal !== '$0' && constructionVal !== '-$0') {
       breakdownBody.push(['Construction cost', constructionVal]);
     }
     
     // Add professional fees
     var professionalVal = val('b-professional');
-    if (professionalVal && professionalVal !== '$0' && professionalVal !== '−$0') {
+    if (professionalVal && professionalVal !== '$0' && professionalVal !== '-$0') {
       breakdownBody.push(['Professional fees', professionalVal]);
     }
     
     // Add finance costs
     var financeVal = val('b-finance');
-    if (financeVal && financeVal !== '$0' && financeVal !== '−$0') {
+    if (financeVal && financeVal !== '$0' && financeVal !== '-$0') {
       breakdownBody.push(['Finance costs', financeVal]);
     }
     
     // Add establishment fee if it exists
     var fundingFeeVal = val('b-funding-fee');
-    if (fundingFeeVal && fundingFeeVal !== '$0' && fundingFeeVal !== '−$0') {
+    if (fundingFeeVal && fundingFeeVal !== '$0' && fundingFeeVal !== '-$0') {
       breakdownBody.push(['Establishment fee (3%)', fundingFeeVal]);
     }
     
     // Add sales & marketing
     var salesVal = val('b-sales');
-    if (salesVal && salesVal !== '$0' && salesVal !== '−$0') {
+    if (salesVal && salesVal !== '$0' && salesVal !== '-$0') {
       breakdownBody.push(['Sales & marketing', salesVal]);
     }
     
     // Add contingency
     var contingencyVal = val('b-contingency');
-    if (contingencyVal && contingencyVal !== '$0' && contingencyVal !== '−$0') {
+    if (contingencyVal && contingencyVal !== '$0' && contingencyVal !== '-$0') {
       breakdownBody.push(['Contingency', contingencyVal]);
     }
     
     // Add other costs
     var otherVal = val('b-other');
-    if (otherVal && otherVal !== '$0' && otherVal !== '−$0') {
+    if (otherVal && otherVal !== '$0' && otherVal !== '-$0') {
       breakdownBody.push(['Other costs', otherVal]);
     }
     
     // Add developer margin
     var marginVal = val('b-margin');
-    if (marginVal && marginVal !== '$0' && marginVal !== '−$0') {
+    if (marginVal && marginVal !== '$0' && marginVal !== '-$0') {
       breakdownBody.push(['Developer margin', marginVal]);
     }
     

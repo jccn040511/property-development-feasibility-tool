@@ -43,7 +43,7 @@
           </div>
 
           <div class="input-group">
-            <h2>Project Value</h2>
+            <h2>Project value &amp; revenue</h2>
             <div class="input-row">
               <label for="currentLandValue">
                 Current land value $
@@ -76,14 +76,6 @@
               </label>
               <input type="number" id="totalGRV" value="0" min="0" step="1000">
             </div>
-            <div class="row computed">
-              <span class="label">Net sales revenue (lots being sold)</span>
-              <span class="value" id="netSalesRevenue">$0</span>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <h2>Revenue</h2>
             <div class="input-row">
               <label for="numLots">Number of lots (in project)</label>
               <input type="number" id="numLots" value="0" min="0" step="1">
@@ -108,54 +100,42 @@
               <label for="constructionCost">Construction cost (total) $</label>
               <input type="number" id="constructionCost" value="0" min="0" step="1000">
             </div>
-          </div>
-
-          <div class="input-group advanced-costs-section">
-            <h2>Advanced Costs</h2>
-            <button type="button" class="toggle-btn" id="advancedCostsToggle" aria-expanded="true" aria-controls="advancedCostsContent">
-              <span>Advanced Costs</span>
-              <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div class="advanced-costs-content" id="advancedCostsContent" style="display: block;">
-              <div class="input-row">
-                <label for="professionalFeesPct">Professional fees — % of construction</label>
-                <div class="input-with-derived">
-                  <input type="number" id="professionalFeesPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
-                  <span class="derived-value" id="derived-professional">→ $0</span>
-                </div>
+            <div class="input-row">
+              <label for="professionalFeesPct">Professional fees — % of construction</label>
+              <div class="input-with-derived">
+                <input type="number" id="professionalFeesPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
+                <span class="derived-value" id="derived-professional">→ $0</span>
               </div>
-              <div class="input-row">
-                <label for="contingencyPct">Contingency — % of construction</label>
-                <div class="input-with-derived">
-                  <input type="number" id="contingencyPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
-                  <span class="derived-value" id="derived-contingency">→ $0</span>
-                </div>
+            </div>
+            <div class="input-row">
+              <label for="contingencyPct">Contingency — % of construction</label>
+              <div class="input-with-derived">
+                <input type="number" id="contingencyPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
+                <span class="derived-value" id="derived-contingency">→ $0</span>
               </div>
-              <div class="input-row">
-                <label for="salesMarketingPct">Sales & marketing — % of Gross Sales</label>
-                <div class="input-with-derived">
-                  <input type="number" id="salesMarketingPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
-                  <span class="derived-value" id="derived-sales">→ $0</span>
-                </div>
+            </div>
+            <div class="input-row">
+              <label for="salesMarketingPct">Sales & marketing — % of Gross Sales</label>
+              <div class="input-with-derived">
+                <input type="number" id="salesMarketingPct" value="0" min="0" max="100" step="0.1" class="input-narrow">
+                <span class="derived-value" id="derived-sales">→ $0</span>
               </div>
-              <div class="input-row">
-                <label for="otherCosts">
-                  Other costs $
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc.</p>
-                    </div>
-                  </span>
-                </label>
-                <input type="number" id="otherCosts" value="0" min="0" step="1000">
-              </div>
+            </div>
+            <div class="input-row">
+              <label for="otherCosts">
+                Other costs $
+                <span class="tooltip-wrapper">
+                  <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  <div class="tooltip-content">
+                    <p>Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc.</p>
+                  </div>
+                </span>
+              </label>
+              <input type="number" id="otherCosts" value="0" min="0" step="1000">
             </div>
           </div>
 
@@ -340,6 +320,10 @@
               <div class="result-item">
                 <span class="result-label">On-Completion Value (As-Complete)</span>
                 <span class="result-value" id="endValue">$0</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Gross Sales</span>
+                <span class="result-value" id="summaryGdv">$0</span>
               </div>
             </div>
           </div>
@@ -605,23 +589,19 @@
         <button type="button" class="help-close" id="helpClose" aria-label="Close help panel">×</button>
       </div>
       <div class="help-content">
-        <h2>Project Value</h2>
+        <h2>Project value &amp; revenue</h2>
         <p><strong>Current land value</strong><br>
         The current market value of the land if sold today (before development). Shows if development adds more value than just holding/selling the land. Also used for LTV calculations by lenders.</p>
         <p><strong>Total as-completed value (GRV)</strong><br>
         The total value of ALL lots created by the development, including ones you keep. Example: If creating 2 lots worth $3.7M each, GRV = $7.4M (even if you only sell one). Shows total wealth creation, not just cash from sales.</p>
-        <p><strong>Net sales revenue</strong><br>
-        Total revenue from lots you're actually selling. This is the cash that pays the bank and covers costs.</p>
-
-        <h2>Revenue</h2>
-        <p><strong>Number of lots</strong><br>
+        <p><strong>Number of lots (in project)</strong><br>
         Total number of lots or dwellings in your development project. Typical range: 2-50 lots for small-medium developments.</p>
-        <p><strong>Lots expected to sell</strong><br>
+        <p><strong>Number of units for sale</strong><br>
         Number of lots you'll actually sell. If keeping some lots (e.g., for rental), enter only the lots you'll sell. Cannot exceed total project lots.</p>
         <p><strong>Average sale price</strong><br>
         Your estimated selling price for each lot/dwelling, based on comparable sales and market conditions. Tip: Use conservative estimates.</p>
         <p><strong>Gross Sales</strong><br>
-        Total revenue from selling lots = Lots Expected to Sell × Average Sale Price. All costs and profit are deducted from this to determine Residual Land Value.</p>
+        Total revenue from selling lots = Units for Sale × Average Sale Price. This is the cash that pays the bank and covers costs. All costs and profit are deducted from Gross Sales to determine Residual Land Value.</p>
 
         <h2>Costs</h2>
         <p><strong>Construction cost</strong><br>

@@ -231,7 +231,7 @@ body {
 }
 
 .card h2 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--mercer-blue);
   margin: 0 0 1.5rem 0;
@@ -293,7 +293,7 @@ body {
 }
 
 .group-title {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -393,7 +393,7 @@ body {
 }
 
 .inputs-section .input-group > h2 {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -403,6 +403,25 @@ body {
 
 .input-group .input-row:last-of-type {
   margin-bottom: 0.75rem;
+}
+
+.input-subblock {
+  margin-bottom: 1.25rem;
+}
+
+.input-subblock:last-child {
+  margin-bottom: 0;
+}
+
+.input-subblock-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .row {
@@ -446,7 +465,8 @@ body {
 }
 
 .input-row label {
-  flex: 0 0 42%;
+  flex: 1 1 42%;
+  min-width: 0;
   margin-bottom: 0.5rem;
   font-size: 11px;
   font-weight: 600;
@@ -461,7 +481,8 @@ body {
 }
 
 .input-row input:not(.input-narrow):not(.input-medium):not(.input-wide) {
-  flex: 1;
+  flex: 0 1 160px;
+  max-width: 160px;
   min-width: 0;
 }
 
@@ -793,13 +814,22 @@ input[type="number"] {
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
 }
 
-.project-summary h3 {
-  font-size: 0.75rem;
+.project-summary h2 {
+  font-size: 14px;
   font-weight: 600;
   margin: 0 0 1rem;
-  color: var(--accent);
+  color: var(--mercer-blue);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.5px;
+}
+
+.project-summary h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--mercer-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .summary-grid {
@@ -947,6 +977,16 @@ input[type="number"] {
 
 .results-details-toggle {
   flex-shrink: 0;
+  font-size: 14px;
+}
+
+.results-section .breakdown h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--mercer-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .card-inner {
@@ -1010,7 +1050,10 @@ input[type="number"] {
 }
 
 .breakdown-table td:last-child,
+.breakdown-table th:last-child,
+.sensitivity-table td:nth-child(2),
 .sensitivity-table td:last-child,
+.sensitivity-table th:nth-child(2),
 .sensitivity-table th:last-child {
   text-align: right;
   font-family: var(--font-mono);
@@ -1786,18 +1829,6 @@ input[type="number"] {
 }
 
 /* Advanced Costs – single expandable section */
-.advanced-costs-section {
-  margin-top: 1rem;
-}
-
-.advanced-costs-section .toggle-btn {
-  margin-bottom: 0.25rem;
-}
-
-.advanced-costs-section .advanced-costs-content {
-  margin-top: 0.5rem;
-}
-
 .toggle-btn {
   display: flex;
   align-items: center;
