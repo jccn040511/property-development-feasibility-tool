@@ -21,20 +21,33 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=5">
+  <style>
+    /* Value inputs: 200px width; align-self stops stretch when parent is flex column (mobile) */
+    .input-row input.input-value {
+      align-self: flex-start !important;
+      flex: 0 0 auto !important;
+      width: 200px !important;
+      min-width: 0 !important;
+      max-width: 200px !important;
+      box-sizing: border-box !important;
+    }
+  </style>
 </head>
 <body class="font-sans antialiased bg-white text-black">
   <div class="app max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-6 py-8">
     <header class="header border-b-2 border-black mb-10 pb-8">
-      <div class="flex flex-wrap items-center gap-8">
+      <div class="header-content flex flex-wrap items-center gap-8">
         <div class="flex-shrink-0">
-          <img src="assets/mfg-logo.png" alt="Mercer Funding Group" class="logo max-w-[180px] h-auto block" id="mfg-logo">
+          <a href="https://www.mercerfg.com.au/contact" class="logo-link" aria-label="Mercer Funding Group – Contact" target="_blank" rel="noopener noreferrer">
+            <img src="assets/mfg-logo.png" alt="Mercer Funding Group" class="logo max-w-[180px] h-auto block" id="mfg-logo">
+          </a>
         </div>
-        <div class="flex-1 min-w-[280px]">
+        <div class="header-text flex-1 min-w-[280px]">
           <h1 class="text-xl sm:text-2xl font-bold text-black m-0">Property Development Feasibility Calculator</h1>
           <p class="tagline text-gray-600 mt-1 mb-0">Estimate your Residual Land Value and start your project journey.</p>
         </div>
-        <div class="flex items-center ml-auto">
+        <div class="header-actions flex items-center ml-auto">
           <div class="help-control flex items-center gap-2">
             <span class="help-label text-sm font-medium text-black">Help</span>
             <button type="button" class="help-btn p-2 rounded-lg border border-mercer-border hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2" id="helpBtn" aria-label="Open help panel">
@@ -92,7 +105,7 @@
                   </div>
                 </span>
               </label>
-              <input type="number" id="currentLandValue" value="0" min="0" step="1000">
+              <input type="number" id="currentLandValue" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="totalGRV">
@@ -108,19 +121,19 @@
                   </div>
                 </span>
               </label>
-              <input type="number" id="totalGRV" value="0" min="0" step="1000">
+              <input type="number" id="totalGRV" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="numLots">Number of lots (in project)</label>
-              <input type="number" id="numLots" value="0" min="0" step="1">
+              <input type="number" id="numLots" class="input-value" value="0" min="0" step="1" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="lotsExpectedToSell">Number of Units for Sale</label>
-              <input type="number" id="lotsExpectedToSell" value="0" min="0" step="1">
+              <input type="number" id="lotsExpectedToSell" class="input-value" value="0" min="0" step="1" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="avgSalePrice">Average sale price (per lot sold) $</label>
-              <input type="number" id="avgSalePrice" value="0" min="0" step="1000">
+              <input type="number" id="avgSalePrice" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="row computed">
               <span class="label">Gross Sales</span>
@@ -132,7 +145,7 @@
             <h2 class="input-group-title">Costs</h2>
             <div class="input-row">
               <label for="constructionCost">Construction cost (total) $</label>
-              <input type="number" id="constructionCost" value="0" min="0" step="1000">
+              <input type="number" id="constructionCost" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="professionalFeesPct">Professional fees — % of construction</label>
@@ -169,11 +182,11 @@
                   </div>
                 </span>
               </label>
-              <input type="number" id="otherCosts" value="0" min="0" step="1000">
+              <input type="number" id="otherCosts" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
             <div class="input-row">
               <label for="stampDuty">Stamp duty $</label>
-              <input type="number" id="stampDuty" value="0" min="0" step="1000">
+              <input type="number" id="stampDuty" class="input-value" value="0" min="0" step="1000" style="flex: 0 0 200px; width: 200px; max-width: 200px; min-width: 0; box-sizing: border-box;">
             </div>
           </div>
 
@@ -712,5 +725,28 @@
   </script>
   
   <script src="app.js"></script>
+  <script>
+    (function() {
+      function forceValueInputSizes() {
+        var ids = ['currentLandValue', 'totalGRV', 'numLots', 'lotsExpectedToSell', 'avgSalePrice', 'constructionCost', 'otherCosts', 'stampDuty'];
+        ids.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.style.setProperty('align-self', 'flex-start', 'important');
+            el.style.setProperty('flex', '0 0 auto', 'important');
+            el.style.setProperty('width', '200px', 'important');
+            el.style.setProperty('max-width', '200px', 'important');
+            el.style.setProperty('min-width', '0', 'important');
+            el.style.setProperty('box-sizing', 'border-box', 'important');
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', forceValueInputSizes);
+      } else {
+        forceValueInputSizes();
+      }
+    })();
+  </script>
 </body>
 </html>

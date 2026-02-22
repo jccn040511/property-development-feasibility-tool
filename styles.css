@@ -223,6 +223,21 @@ body {
   align-items: center;
 }
 
+.logo-link {
+  display: inline-block;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.logo-link:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+.logo-link:focus {
+  outline: 2px solid var(--mercer-sky);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .logo {
   max-width: 180px;
   height: auto;
@@ -629,6 +644,14 @@ body {
   width: 240px !important;
   min-width: 240px !important;
   max-width: 240px !important;
+}
+
+/* Value inputs (currency/count): same fixed-width pattern as input-narrow so they stay small on tablet/mobile */
+.input-value {
+  flex: 0 0 200px !important;
+  width: 200px !important;
+  min-width: 0 !important;
+  max-width: 200px !important;
 }
 
 .input-full {
@@ -1581,6 +1604,34 @@ input[type="number"] {
   margin-left: 0.35rem;
 }
 
+/* Tablet and below: constrain input size so they don't dominate (applies from 1024px down) */
+@media (max-width: 1024px) {
+  .input-row input:not(.input-narrow):not(.input-medium):not(.input-wide),
+  .input-row input,
+  .input-row .input-with-derived input {
+    max-width: 200px !important;
+    min-height: 38px;
+    padding: 0.4rem 0.6rem;
+    box-sizing: border-box;
+  }
+  .input-narrow,
+  .input-medium,
+  .input-wide {
+    max-width: 200px !important;
+    min-width: 0 !important;
+  }
+  /* Value inputs: fixed width so they don't expand (flex stops stretch) */
+  .input-value {
+    flex: 0 0 200px !important;
+    width: 200px !important;
+    max-width: 200px !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    padding: 0.4rem 0.6rem !important;
+    box-sizing: border-box !important;
+  }
+}
+
 @media (max-width: 768px) {
   .app {
     padding: 1.5rem 1rem;
@@ -1593,12 +1644,14 @@ input[type="number"] {
 
   .header-content {
     flex-direction: column;
+    align-items: center;
     text-align: center;
     gap: 1.5rem;
   }
 
   .header-text {
     min-width: auto;
+    width: 100%;
   }
 
   .header h1 {
@@ -1695,18 +1748,20 @@ input[type="number"] {
     width: 100%;
   }
 
-  .input-row input,
+  .input-row input:not(.input-value),
   .input-row .input-with-derived {
     width: 100%;
+    max-width: 200px;
     flex: 1 1 100%;
+    box-sizing: border-box;
   }
 
   .input-narrow,
   .input-medium,
   .input-wide {
     width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
+    min-width: 0 !important;
+    max-width: 200px !important;
   }
 
   .tooltip-content {
@@ -1729,6 +1784,83 @@ input[type="number"] {
 
   .help-label {
     display: none;
+  }
+
+  /* Results panel: full-height flow on mobile (no fixed scroll box) */
+  .main-right {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Tables: horizontal scroll if needed, larger font for readability */
+  .breakdown.card-inner,
+  .sensitivity.card-inner {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .breakdown-table,
+  .sensitivity-table {
+    font-size: 0.875rem;
+    min-width: 260px;
+  }
+  .breakdown-table td,
+  .sensitivity-table th,
+  .sensitivity-table td {
+    padding: 0.5rem 0.6rem;
+  }
+  .sensitivity-table thead th {
+    font-size: 0.7rem;
+  }
+
+  /* Settlement: better wrapping and touch-friendly spacing */
+  .settlement-item {
+    flex-wrap: wrap;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    min-height: 44px;
+    align-items: center;
+  }
+  .settlement-label {
+    flex: 1 1 60%;
+    min-width: 0;
+    word-wrap: break-word;
+    padding-right: 0.5rem;
+  }
+  .settlement-value {
+    flex: 0 0 auto;
+    font-weight: 600;
+  }
+
+  /* Touch-friendly but proportioned: cap input width, slightly reduce height */
+  .input-row input,
+  .input-row .input-with-derived input {
+    max-width: 200px !important;
+    min-height: 40px;
+    padding: 0.4rem 0.6rem;
+  }
+  .panel-header-results .mercer-cta-btn,
+  .export-in-header {
+    min-height: 44px;
+  }
+  .panel-header-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .panel-header-results .panel-title {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  /* Value inputs: fixed width; align-self stops cross-axis stretch in column layout */
+  .input-value {
+    align-self: flex-start !important;
+    flex: 0 0 auto !important;
+    width: 200px !important;
+    max-width: 200px !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    padding: 0.4rem 0.6rem !important;
+    box-sizing: border-box !important;
+    margin-top: 5px;
   }
 }
 
