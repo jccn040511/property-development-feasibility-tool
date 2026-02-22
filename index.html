@@ -56,6 +56,21 @@
           <button type="button" class="clear-all-btn px-4 py-2 text-sm font-semibold text-black bg-white border border-white rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-colors" id="clearAllBtn">Clear all</button>
         </div>
         <section class="inputs-section card mercer-card mt-4">
+          <div class="gst-toggle-block mb-4 flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" id="gstInclusiveToggle" checked class="rounded border-gray-300 text-black focus:ring-mercer-sky">
+              <span class="text-sm font-semibold uppercase tracking-wide text-black">Inputs are GST Inclusive</span>
+              <span class="tooltip-wrapper" tabindex="-1">
+                <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div class="tooltip-content">
+                  <p>Gross Sales and Construction are the two biggest GST-impacted areas. When on, the tool deducts GST on sales and credits GST on construction and professional fees in the Net Settlement.</p>
+                  <p class="mt-2"><em>GST treatment here is simplified and for guidance only. It does not replace advice from your accountant or tax adviser.</em></p>
+                </div>
+              </span>
+            </label>
+          </div>
+          <p class="gst-helper-note text-sm text-gray-600 mb-4 px-0" id="gstInclusiveNote">Note: All costs entered should include GST. The tool will calculate your net position accordingly. GST treatment here is simplified and for guidance only; it does not replace advice from your accountant or tax adviser.</p>
+
           <div class="project-name-block mb-6">
             <label for="projectName" class="block">Project name</label>
             <input type="text" id="projectName" placeholder="e.g. Smith Street Development" class="mercer-input w-full">
@@ -142,7 +157,7 @@
             </div>
             <div class="input-row">
               <label for="otherCosts">
-                Other costs $
+                Other costs (excl. stamp duty) $
                 <span class="tooltip-wrapper">
                   <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -150,11 +165,15 @@
                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                   </svg>
                   <div class="tooltip-content">
-                    <p>Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc.</p>
+                    <p>Legal/conveyancing fees, council application fees, and other costs that may attract GST. Excludes stamp duty (use the Stamp duty field below).</p>
                   </div>
                 </span>
               </label>
               <input type="number" id="otherCosts" value="0" min="0" step="1000">
+            </div>
+            <div class="input-row">
+              <label for="stampDuty">Stamp duty $</label>
+              <input type="number" id="stampDuty" value="0" min="0" step="1000">
             </div>
           </div>
 
@@ -206,7 +225,7 @@
                       <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
                     <div class="tooltip-content">
-                      <p>The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% establishment fee.</p>
+                      <p>The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% facility fees.</p>
                     </div>
                   </span>
                 </span>
@@ -230,7 +249,7 @@
               </div>
               <div class="row computed" id="fundingFeeDisplay" style="display: none;">
                 <span class="label">
-                  Establishment Fee (Est.)
+                  Total Facility Fees (Est.)
                   <span class="tooltip-wrapper">
                     <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
@@ -274,9 +293,10 @@
 
       <div class="main-right lg:col-span-6 xl:col-span-6 lg:sticky lg:top-8 lg:self-start max-h-[calc(100vh-4rem)] overflow-y-auto panel-column panel-results pt-6">
         <div class="panel-header-bar panel-header-results">
-          <span class="panel-title">Pre-tax Feasibility Summary</span>
+          <span class="panel-title" id="resultsPanelTitle">Pre-tax Feasibility Summary</span>
           <button type="button" class="mercer-cta-btn export-in-header px-4 py-2 bg-white text-black font-semibold rounded-lg border border-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-colors" id="exportPdfBtn">Export to PDF</button>
         </div>
+        <p class="results-gst-exc-note text-sm text-gray-600 mt-2 mb-2 px-0" id="resultsGstExcNote" style="display: none;">Note: Figures reflect a Net-of-GST methodology.</p>
         <section class="results-section card mercer-card mt-4">
           <div class="project-summary card-inner mercer-card-inner">
             <h2 class="text-sm font-semibold uppercase tracking-wide text-black mb-3">Project Summary</h2>
@@ -422,7 +442,7 @@
                       <td id="b-finance">−$0</td>
                     </tr>
                     <tr id="b-funding-fee-row" style="display: none;">
-                      <td>Establishment fee (Est.)</td>
+                      <td>Total Facility Fees (Est.)</td>
                       <td id="b-funding-fee">−$0</td>
                     </tr>
                     <tr>
@@ -434,8 +454,12 @@
                       <td id="b-contingency">−$0</td>
                     </tr>
                     <tr>
-                      <td>Less Other Costs</td>
+                      <td>Less Other costs (excl. stamp duty)</td>
                       <td id="b-other">−$0</td>
+                    </tr>
+                    <tr>
+                      <td>Less Stamp duty</td>
+                      <td id="b-stamp-duty">−$0</td>
                     </tr>
                     <tr>
                       <td>Less Developer Margin</td>
@@ -450,23 +474,43 @@
               </div>
 
               <div class="settlement-position card-inner">
-                <h3>Net Settlement Position</h3>
+                <h3 id="netSettlementHeader">Net Settlement Position</h3>
                 <div class="settlement-grid">
                   <div class="settlement-item">
                     <span class="settlement-label">Gross Sales</span>
                     <span id="settlement-gross-sales" class="settlement-value">$0</span>
+                  </div>
+                  <div class="settlement-item negative gst-settlement-row" id="settlement-gst-sales-row" style="display: none;">
+                    <span class="settlement-label">Less GST on Sales</span>
+                    <span id="settlement-gst-sales" class="settlement-value">−$0</span>
+                  </div>
+                  <div class="settlement-item gst-settlement-row" id="settlement-gst-credit-row" style="display: none;">
+                    <span class="settlement-label">GST Credit (on taxable costs)</span>
+                    <span id="settlement-gst-credit" class="settlement-value">$0</span>
                   </div>
                   <div class="settlement-item negative">
                     <span class="settlement-label">Less Selling Costs</span>
                     <span id="settlement-selling-costs" class="settlement-value">−$0</span>
                   </div>
                   <div class="settlement-item negative">
+                    <span class="settlement-label">Less Professional Fees</span>
+                    <span id="settlement-professional-fees" class="settlement-value">−$0</span>
+                  </div>
+                  <div class="settlement-item negative">
+                    <span class="settlement-label">Less Contingency</span>
+                    <span id="settlement-contingency" class="settlement-value">−$0</span>
+                  </div>
+                  <div class="settlement-item negative">
                     <span class="settlement-label">Less Facility Repayment</span>
                     <span id="settlement-facility" class="settlement-value">−$0</span>
                   </div>
                   <div class="settlement-item negative">
-                    <span class="settlement-label">Less Other Costs</span>
+                    <span class="settlement-label">Less Other costs (excl. stamp duty)</span>
                     <span id="settlement-other-costs" class="settlement-value">−$0</span>
+                  </div>
+                  <div class="settlement-item negative">
+                    <span class="settlement-label">Less Stamp duty</span>
+                    <span id="settlement-stamp-duty" class="settlement-value">−$0</span>
                   </div>
                   <div class="settlement-item total" id="settlement-result">
                     <span class="settlement-label">Cash Result</span>
@@ -519,7 +563,7 @@
           </div>
         </section>
         <div class="results-pre-tax-note mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p class="text-sm font-medium text-amber-900 m-0"><strong>Note:</strong> All figures are calculated pre-tax. GST and Income Tax are not accounted for and will reduce the final cash result.</p>
+          <p class="text-sm font-medium text-amber-900 m-0"><strong>Note:</strong> Results are on a pre-tax basis. Income tax is not included and will reduce the final cash result. Where GST is included, the tool uses a simplified GST treatment for guidance only and does not replace advice from your accountant or tax adviser.</p>
         </div>
       </div>
     </div>
@@ -543,7 +587,7 @@
 
     <section class="disclaimer">
       <p><strong>Disclaimer:</strong> This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions.</p>
-      <p class="mt-2"><strong>Pre-tax basis:</strong> Results are shown on a pre-tax basis. GST and income tax obligations are not included and will substantially impact the final net position.</p>
+      <p class="mt-2"><strong>Pre-tax basis:</strong> Results are on a pre-tax basis. Income tax is not included and will substantially impact the final net position. Where GST is included, the tool uses a simplified GST treatment for guidance only and does not replace advice from your accountant or tax adviser.</p>
     </section>
   </div>
 
@@ -577,14 +621,15 @@
           <div class="help-metric-card"><div class="help-metric-term">Professional fees</div><p class="help-metric-tip">Industry standard: 6–12% of construction cost.</p><p class="help-metric-desc">Architect, structural engineer, civil engineer, project manager, and other consultants.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Contingency</div><p class="help-metric-tip">Typical range: 5–10% of construction cost.</p><p class="help-metric-desc">Reserve fund for cost overruns, variations, and unforeseen issues. Higher contingency if project is complex or you have less certainty.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Sales &amp; marketing</div><p class="help-metric-tip">Typical range: 3–5% of Gross Sales.</p><p class="help-metric-desc">Real estate agent commissions, marketing materials, advertising, staging, etc.</p></div>
-          <div class="help-metric-card"><div class="help-metric-term">Other costs</div><p class="help-metric-tip">Typical: $20,000–$100,000+ depending on land value and complexity.</p><p class="help-metric-desc">Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Other costs (excl. stamp duty)</div><p class="help-metric-tip">Typical: $20,000–$100,000+ depending on complexity.</p><p class="help-metric-desc">Legal/conveyancing fees, council application fees, and other costs that may attract GST. Excludes stamp duty (use Stamp duty below).</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Stamp duty</div><p class="help-metric-tip">Varies by state and land value.</p><p class="help-metric-desc">Duty payable on the land purchase. Not included in GST credit calculations.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Construction amount required (net)</div><p class="help-metric-desc">The actual construction amount you need to borrow (before interest and fees). The calculator determines the total facility size needed to cover this plus interest and establishment fees.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Interest rate</div><p class="help-metric-tip">Typical range: 8–15% p.a. for private development finance.</p><p class="help-metric-desc">Private lender interest rate per annum. Higher rates significantly increase finance costs.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Construction period</div><p class="help-metric-tip">Typical: 6–18 months depending on project size.</p><p class="help-metric-desc">How long construction will take from start to completion. Longer builds = more interest costs.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Facility term</div><p class="help-metric-desc">Total duration of the facility including construction and sales period. Must be ≥ construction period. Longer terms = higher interest costs but more time to sell.</p></div>
-          <div class="help-metric-card"><div class="help-metric-term">Calculated facility size</div><p class="help-metric-desc">The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% establishment fee.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Calculated facility size</div><p class="help-metric-desc">The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% facility fees.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Finance cost</div><p class="help-metric-desc">Interest calculated on 55% average utilization during construction, then 100% during the tail period. Interest is capitalised monthly (added to principal), so you pay interest on interest.</p></div>
-          <div class="help-metric-card"><div class="help-metric-term">Establishment Fee (Est.)</div><p class="help-metric-desc">An upfront fee typically charged by private lenders, calculated as a percentage of the total facility limit. While this calculator uses a 3% benchmark as a standard guide for private funding, actual fees can vary (typically ranging from 1.5% to 4%) depending on the specific funder, project risk, and loan structure. This fee is built into the facility calculation (grossed up), ensuring the lender receives their fee while still providing sufficient funds for construction.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Total Facility Fees (Est.)</div><p class="help-metric-desc">An upfront fee typically charged by private lenders, calculated as a percentage of the total facility limit. While this calculator uses a 3% benchmark as a standard guide for private funding, actual fees can vary (typically ranging from 1.5% to 4%) depending on the specific funder, project risk, and loan structure. This fee is built into the facility calculation (grossed up), ensuring the lender receives their fee while still providing sufficient funds for construction.</p></div>
           <div class="help-metric-card"><div class="help-metric-term">Developer margin</div><p class="help-metric-tip">Typical range: 15–25%. Most lenders require minimum 15% margin for finance approval.</p><p class="help-metric-desc">The profit margin you want to achieve as a percentage of total sales (Gross Sales). Higher margin = lower RLV (less you can pay for land).</p></div>
         </section>
 
@@ -603,11 +648,12 @@
         <section class="help-section">
           <h2 class="help-section-header">
             <span class="help-section-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
-            Tax Considerations (Not included in this calculation)
+            Tax Considerations
           </h2>
+          <p class="help-section-intro text-sm text-gray-600 mb-3">Income tax and land tax are not included in this calculation.</p>
           <div class="help-metric-card">
             <div class="help-metric-term">GST</div>
-            <p class="help-metric-desc">This calculator uses "Gross Sales" inclusive of GST. Depending on whether you use the Margin Scheme, GST can reduce your net profit by roughly 1/11th of the value uplift.</p>
+            <p class="help-metric-desc">Use the &quot;Inputs are GST Inclusive&quot; toggle in the inputs section. When <strong>on</strong>, the tool deducts GST on sales and credits GST on taxable costs (construction, professional fees, contingency, sales &amp; marketing, other costs excluding stamp duty) in the Net Settlement. When <strong>off</strong>, all figures are net of GST. This GST treatment is simplified and for guidance only; it does not replace advice from your accountant or tax adviser.</p>
           </div>
           <div class="help-metric-card">
             <div class="help-metric-term">Income Tax / CGT</div>

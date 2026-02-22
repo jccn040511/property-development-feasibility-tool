@@ -108,7 +108,9 @@
       salesMarketingPct: parseFloat(byId('salesMarketingPct').value) || 0,
       contingencyPct: parseFloat(byId('contingencyPct').value) || 0,
       otherCosts: parseFloat(byId('otherCosts').value) || 0,
-      developerMarginPct: parseFloat(byId('developerMarginPct').value) || 0
+      stampDuty: parseFloat(byId('stampDuty').value) || 0,
+      developerMarginPct: parseFloat(byId('developerMarginPct').value) || 0,
+      gstInclusive: byId('gstInclusiveToggle') ? byId('gstInclusiveToggle').checked : true
     };
   }
 
@@ -170,13 +172,22 @@
   function update() {
     updateResultsProjectNameDisplay();
     var i = getInputs();
+    var gstNoteEl = byId('gstInclusiveNote');
+    if (gstNoteEl) gstNoteEl.style.display = i.gstInclusive ? '' : 'none';
+    var resultsTitleEl = byId('resultsPanelTitle');
+    if (resultsTitleEl) resultsTitleEl.textContent = i.gstInclusive ? 'PRE-TAX FEASIBILITY SUMMARY (GST INC)' : 'PRE-TAX FEASIBILITY SUMMARY (GST EXC)';
+    var gstExcNoteEl = byId('resultsGstExcNote');
+    if (gstExcNoteEl) gstExcNoteEl.style.display = i.gstInclusive ? 'none' : '';
+    var netSettlementHeaderEl = byId('netSettlementHeader');
+    if (netSettlementHeaderEl) netSettlementHeaderEl.textContent = i.gstInclusive ? 'NET SETTLEMENT (GST INCLUSIVE)' : 'Net Settlement Position';
     var c = calcCosts(i);
-    var rlv = calcRLV(i.gdv, i.constructionCost, c, i.otherCosts);
+    var totalOtherCosts = i.otherCosts + i.stampDuty;
+    var rlv = calcRLV(i.gdv, i.constructionCost, c, totalOtherCosts);
     var rlvPerLot = i.numLots > 0 ? rlv / i.numLots : 0;
-    var profitMarginPct = i.gdv > 0 ? ((i.gdv - i.constructionCost - c.professionalFees - c.financeCosts - c.fundingFee - c.salesMarketing - c.contingency - i.otherCosts) / i.gdv) * 100 : null;
+    var profitMarginPct = i.gdv > 0 ? ((i.gdv - i.constructionCost - c.professionalFees - c.financeCosts - c.fundingFee - c.salesMarketing - c.contingency - totalOtherCosts) / i.gdv) * 100 : null;
     
     var projectLift = i.totalGRV - (i.currentLandValue + i.constructionCost);
-    var totalCosts = i.constructionCost + c.professionalFees + c.financeCosts + c.fundingFee + c.salesMarketing + c.contingency + i.otherCosts;
+    var totalCosts = i.constructionCost + c.professionalFees + c.financeCosts + c.fundingFee + c.salesMarketing + c.contingency + totalOtherCosts;
     var netValueCreated = i.totalGRV - totalCosts;
     var roe = i.currentLandValue > 0 ? (projectLift / i.currentLandValue) * 100 : null;
     var ltv = i.totalGRV > 0 ? ((i.amountFinanced / i.totalGRV) * 100) : null;
@@ -264,21 +275,42 @@
     byId('b-sales').textContent = '−' + formatCurrency(c.salesMarketing);
     byId('b-contingency').textContent = '−' + formatCurrency(c.contingency);
     byId('b-other').textContent = '−' + formatCurrency(i.otherCosts);
+    if (byId('b-stamp-duty')) byId('b-stamp-duty').textContent = '−' + formatCurrency(i.stampDuty);
     byId('b-margin').textContent = '−' + formatCurrency(c.developerMargin);
     byId('b-rlv').textContent = formatCurrency(rlv);
 
-    // Net Settlement Position calculations
-    // Note: Professional Fees and Contingency are NOT included here as they are paid during construction, not at settlement
+    // Net Settlement Position calculations – all cost categories shown for clarity
     var grossSales = i.gdv;
     var sellingCosts = c.salesMarketing;
     var facilityRepayment = i.amountFinanced;
-    var otherCosts = i.otherCosts;
-    var cashResult = grossSales - sellingCosts - facilityRepayment - otherCosts;
-    
+    var otherCostsSettlement = i.otherCosts;
+    var stampDutySettlement = i.stampDuty;
+    var gstInclusive = i.gstInclusive;
+    var gstOnSales = 0;
+    var gstCreditOnCosts = 0;
+    var cashResult;
+    if (gstInclusive) {
+      gstOnSales = grossSales / 11;
+      // GST credit on taxable costs only (construction, professional fees, contingency, sales & marketing, other costs excl. stamp duty)
+      gstCreditOnCosts = (i.constructionCost + c.professionalFees + c.contingency + c.salesMarketing + i.otherCosts) / 11;
+      cashResult = grossSales - gstOnSales - sellingCosts - c.professionalFees - c.contingency - facilityRepayment - otherCostsSettlement - stampDutySettlement + gstCreditOnCosts;
+    } else {
+      cashResult = grossSales - sellingCosts - c.professionalFees - c.contingency - facilityRepayment - otherCostsSettlement - stampDutySettlement;
+    }
+
     if (byId('settlement-gross-sales')) byId('settlement-gross-sales').textContent = formatCurrency(grossSales);
+    var gstSalesRow = byId('settlement-gst-sales-row');
+    var gstCreditRow = byId('settlement-gst-credit-row');
+    if (gstSalesRow) gstSalesRow.style.display = gstInclusive ? '' : 'none';
+    if (gstCreditRow) gstCreditRow.style.display = gstInclusive ? '' : 'none';
+    if (byId('settlement-gst-sales')) byId('settlement-gst-sales').textContent = '−' + formatCurrency(gstOnSales);
+    if (byId('settlement-gst-credit')) byId('settlement-gst-credit').textContent = formatCurrency(gstCreditOnCosts);
     if (byId('settlement-selling-costs')) byId('settlement-selling-costs').textContent = '−' + formatCurrency(sellingCosts);
+    if (byId('settlement-professional-fees')) byId('settlement-professional-fees').textContent = '−' + formatCurrency(c.professionalFees);
+    if (byId('settlement-contingency')) byId('settlement-contingency').textContent = '−' + formatCurrency(c.contingency);
     if (byId('settlement-facility')) byId('settlement-facility').textContent = '−' + formatCurrency(facilityRepayment);
-    if (byId('settlement-other-costs')) byId('settlement-other-costs').textContent = '−' + formatCurrency(otherCosts);
+    if (byId('settlement-other-costs')) byId('settlement-other-costs').textContent = '−' + formatCurrency(otherCostsSettlement);
+    if (byId('settlement-stamp-duty')) byId('settlement-stamp-duty').textContent = '−' + formatCurrency(stampDutySettlement);
     if (byId('settlement-cash-result')) {
       byId('settlement-cash-result').textContent = formatCurrency(cashResult);
       var settlementResultEl = byId('settlement-result');
@@ -314,7 +346,7 @@
         contingency: (i.contingencyPct / 100) * i.constructionCost,
         developerMargin: (i.developerMarginPct / 100) * gdvAlt
       };
-      var rlvAlt = calcRLV(gdvAlt, i.constructionCost, cAlt, i.otherCosts);
+      var rlvAlt = calcRLV(gdvAlt, i.constructionCost, cAlt, i.otherCosts + i.stampDuty);
       byId(grossSalesKeys[idx]).textContent = formatCurrency(gdvAlt);
       var rlvCell = byId(rlvKeys[idx]);
       if (rlvCell) {
@@ -355,7 +387,12 @@
     projectNameEl.addEventListener('change', updateResultsProjectNameDisplay);
   }
 
-  var inputs = ['currentLandValue', 'totalGRV', 'numLots', 'lotsExpectedToSell', 'avgSalePrice', 'constructionCost', 'professionalFeesPct', 'constructionAmountRequired', 'interestRatePct', 'constructionPeriodMonths', 'facilityTermMonths', 'salesMarketingPct', 'contingencyPct', 'otherCosts', 'developerMarginPct'];
+  var gstToggleEl = byId('gstInclusiveToggle');
+  if (gstToggleEl) {
+    gstToggleEl.addEventListener('change', update);
+  }
+
+  var inputs = ['currentLandValue', 'totalGRV', 'numLots', 'lotsExpectedToSell', 'avgSalePrice', 'constructionCost', 'professionalFeesPct', 'constructionAmountRequired', 'interestRatePct', 'constructionPeriodMonths', 'facilityTermMonths', 'salesMarketingPct', 'contingencyPct', 'otherCosts', 'stampDuty', 'developerMarginPct'];
 
   function clearAll() {
     var pn = byId('projectName');
@@ -602,7 +639,7 @@
       doc.setFontSize(8);
       doc.setTextColor(0, 0, 0);
       doc.text('mercerfg.com.au', PAGE_WIDTH - MARGIN, footerY, { align: 'right' });
-      var disclaimer = 'Disclaimer: This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions. Results are shown on a pre-tax basis. GST and income tax obligations are not included and will substantially impact the final net position.';
+      var disclaimer = 'Disclaimer: This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions. Pre-tax basis: Results are on a pre-tax basis. Income tax is not included and will substantially impact the final net position. Where GST is included, the tool uses a simplified GST treatment for guidance only and does not replace advice from your accountant or tax adviser.';
       var disclaimerLines = doc.splitTextToSize(disclaimer, CONTENT_WIDTH);
       footerY += 5;
       disclaimerLines.forEach(function(line) {
@@ -803,8 +840,14 @@
     doc.text(val('rlv') || '—', MARGIN + CONTENT_WIDTH / 2, y + 20, { align: 'center' });
     y += boxH + 8;
 
-    // Breakdown – boxed header, dotted leader rows
+    // Breakdown – methodology (GST) then boxed header, dotted leader rows
     y = sectionTitleBox(doc, 'Breakdown', y);
+    var pdfGstInclusive = byId('gstInclusiveToggle') ? byId('gstInclusiveToggle').checked : true;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Methodology: ' + (pdfGstInclusive ? 'GST Inclusive Inputs' : 'GST Exclusive Inputs'), MARGIN, y);
+    y += 5;
     var breakdownBody = [
       ['Gross Sales', val('b-gdv')]
     ];
@@ -830,7 +873,7 @@
     // Add establishment fee if it exists
     var fundingFeeVal = val('b-funding-fee');
     if (fundingFeeVal && fundingFeeVal !== '$0' && fundingFeeVal !== '-$0') {
-      breakdownBody.push(['Establishment fee (Est.)', fundingFeeVal]);
+      breakdownBody.push(['Total Facility Fees (Est.)', fundingFeeVal]);
     }
     
     // Add sales & marketing
@@ -845,10 +888,14 @@
       breakdownBody.push(['Contingency', contingencyVal]);
     }
     
-    // Add other costs
+    // Add other costs (excl. stamp duty) and stamp duty
     var otherVal = val('b-other');
     if (otherVal && otherVal !== '$0' && otherVal !== '-$0') {
-      breakdownBody.push(['Other costs', otherVal]);
+      breakdownBody.push(['Other costs (excl. stamp duty)', otherVal]);
+    }
+    var stampDutyVal = val('b-stamp-duty');
+    if (stampDutyVal && stampDutyVal !== '$0' && stampDutyVal !== '-$0') {
+      breakdownBody.push(['Stamp duty', stampDutyVal]);
     }
     
     // Add developer margin
@@ -864,15 +911,20 @@
     y += 8;
 
     // Net Settlement Position – ensure room so table never hits footer; boxed header, dotted rows
-    y = ensureSpaceFor(doc, y, 50);
+    y = ensureSpaceFor(doc, y, 62);
     y = sectionTitleBox(doc, 'Net Settlement Position', y);
-    var settlementBody = [
-      ['Gross Sales', val('settlement-gross-sales')],
-      ['Less Selling Costs', val('settlement-selling-costs')],
-      ['Less Facility Repayment', val('settlement-facility')],
-      ['Less Other Costs', val('settlement-other-costs')],
-      ['Cash Result', val('settlement-cash-result')]
-    ];
+    var settlementBody = [['Gross Sales', val('settlement-gross-sales')]];
+    if (pdfGstInclusive) {
+      settlementBody.push(['Less GST on Sales', val('settlement-gst-sales')]);
+      settlementBody.push(['GST Credit (on taxable costs)', val('settlement-gst-credit')]);
+    }
+    settlementBody.push(['Less Selling Costs', val('settlement-selling-costs')]);
+    settlementBody.push(['Less Professional Fees', val('settlement-professional-fees')]);
+    settlementBody.push(['Less Contingency', val('settlement-contingency')]);
+    settlementBody.push(['Less Facility Repayment', val('settlement-facility')]);
+    settlementBody.push(['Less Other costs (excl. stamp duty)', val('settlement-other-costs')]);
+    settlementBody.push(['Less Stamp duty', val('settlement-stamp-duty')]);
+    settlementBody.push(['Cash Result', val('settlement-cash-result')]);
     y = drawDottedRows(doc, settlementBody, y);
     y += 8;
 
