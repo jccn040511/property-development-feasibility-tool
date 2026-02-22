@@ -454,10 +454,25 @@ body {
   align-items: center;
   padding: 0.5rem 0.85rem;
   border-bottom: 1px solid var(--border-subtle);
+  gap: 0.75rem;
+  min-width: 0;
+  overflow: visible;
 }
 
 .results-grid-compact .result-item:last-child {
   border-bottom: none;
+}
+
+.results-grid-compact .result-label {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.results-grid-compact .result-value {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 5.5em;
+  text-align: right;
 }
 
 .result-item-hero {
@@ -1203,6 +1218,8 @@ input[type="number"] {
 .sensitivity-table td:first-child {
   color: var(--text-muted);
   font-weight: 500;
+  min-width: 0;
+  max-width: 55%;
 }
 
 .breakdown-table td:last-child,
@@ -1215,6 +1232,9 @@ input[type="number"] {
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  min-width: 7rem;
+  padding-left: 0.75rem;
 }
 
 .breakdown-table tr.total,
@@ -1792,7 +1812,7 @@ input[type="number"] {
     overflow: visible !important;
   }
 
-  /* Tables: horizontal scroll if needed, larger font for readability */
+  /* Tables: horizontal scroll if needed, ensure value columns not cut off */
   .breakdown.card-inner,
   .sensitivity.card-inner {
     overflow-x: auto;
@@ -1801,7 +1821,13 @@ input[type="number"] {
   .breakdown-table,
   .sensitivity-table {
     font-size: 0.875rem;
-    min-width: 260px;
+    min-width: 280px;
+    table-layout: auto;
+  }
+  .breakdown-table td:last-child,
+  .sensitivity-table td:nth-child(2),
+  .sensitivity-table td:last-child {
+    min-width: 7.5rem;
   }
   .breakdown-table td,
   .sensitivity-table th,

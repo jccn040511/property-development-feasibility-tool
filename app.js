@@ -291,8 +291,10 @@
     var cashResult;
     if (gstInclusive) {
       gstOnSales = grossSales / 11;
-      // GST credit on taxable costs only (construction, professional fees, contingency, sales & marketing, other costs excl. stamp duty)
+      // GST credit on taxable costs (construction, professional fees, contingency, sales & marketing, other costs excl. stamp duty)
+      // Plus facility fee: assume 50% is broker (taxable) component, claim 1/11 of that
       gstCreditOnCosts = (i.constructionCost + c.professionalFees + c.contingency + c.salesMarketing + i.otherCosts) / 11;
+      gstCreditOnCosts += (0.5 * c.fundingFee) / 11;
       cashResult = grossSales - gstOnSales - sellingCosts - c.professionalFees - c.contingency - facilityRepayment - otherCostsSettlement - stampDutySettlement + gstCreditOnCosts;
     } else {
       cashResult = grossSales - sellingCosts - c.professionalFees - c.contingency - facilityRepayment - otherCostsSettlement - stampDutySettlement;
@@ -786,7 +788,7 @@
       ['On-Completion Value (As-Complete)', val('endValue')],
       ['Gross Sales', val('gdv')]
     ], y);
-    y += 8;
+    y += 4;
 
     // Project Health – scorecard: three equal columns, each with light-gray bordered box and large value
     y = sectionTitleBox(doc, 'Project Health', y);
@@ -809,7 +811,7 @@
       doc.setTextColor(0, 0, 0);
       doc.text(healthValues[h] || '—', boxX + boxW / 2, y + scorecardH / 2 + 2, { align: 'center' });
     }
-    y += scorecardH + 8;
+    y += scorecardH + 4;
 
     // Profitability – boxed header, dotted leader rows, values right-aligned
     y = sectionTitleBox(doc, 'Profitability', y);
@@ -820,7 +822,7 @@
       ['Developer profit', val('developerProfit')],
       ['RLV per lot', val('rlvPerLot')]
     ], y);
-    y += 8;
+    y += 4;
 
     // The Bottom Line – hero box: light gray fill, black border, centered RLV at 20pt bold (most prominent)
     y = sectionTitleBox(doc, 'The Bottom Line', y);
@@ -838,9 +840,10 @@
     doc.setFontSize(20);
     doc.setTextColor(0, 0, 0);
     doc.text(val('rlv') || '—', MARGIN + CONTENT_WIDTH / 2, y + 20, { align: 'center' });
-    y += boxH + 8;
+    y += boxH + 4;
 
-    // Breakdown – methodology (GST) then boxed header, dotted leader rows
+    // Breakdown – ensure enough room so RLV row is not squashed against footer
+    y = ensureSpaceFor(doc, y, 100);
     y = sectionTitleBox(doc, 'Breakdown', y);
     var pdfGstInclusive = byId('gstInclusiveToggle') ? byId('gstInclusiveToggle').checked : true;
     doc.setFont('helvetica', 'normal');
@@ -864,10 +867,10 @@
       breakdownBody.push(['Professional fees', professionalVal]);
     }
     
-    // Add finance costs
+    // Add interest costs
     var financeVal = val('b-finance');
     if (financeVal && financeVal !== '$0' && financeVal !== '-$0') {
-      breakdownBody.push(['Finance costs', financeVal]);
+      breakdownBody.push(['Interest costs', financeVal]);
     }
     
     // Add establishment fee if it exists
@@ -908,7 +911,7 @@
     breakdownBody.push(['Residual Land Value', val('b-rlv')]);
 
     y = drawDottedRows(doc, breakdownBody, y);
-    y += 8;
+    y += 14;
 
     // Net Settlement Position – ensure room so table never hits footer; boxed header, dotted rows
     y = ensureSpaceFor(doc, y, 62);
