@@ -159,7 +159,16 @@
       - costs.salesMarketing - costs.contingency - otherCosts - costs.developerMargin;
   }
 
+  function updateResultsProjectNameDisplay() {
+    var el = byId('resultsProjectNameDisplay');
+    if (!el) return;
+    var nameEl = byId('projectName');
+    var name = (nameEl && nameEl.value != null) ? String(nameEl.value).trim() : '';
+    el.textContent = name.length > 0 ? 'Project: ' + name : 'Project: Development Feasibility Summary';
+  }
+
   function update() {
+    updateResultsProjectNameDisplay();
     var i = getInputs();
     var c = calcCosts(i);
     var rlv = calcRLV(i.gdv, i.constructionCost, c, i.otherCosts);
@@ -205,6 +214,14 @@
         rlvEl.classList.add('success');
       }
     }
+    var rlvAlertBox = byId('rlvAlertBox');
+    if (rlvAlertBox) {
+      if (rlv < i.currentLandValue && i.currentLandValue > 0) {
+        rlvAlertBox.classList.remove('hidden');
+      } else {
+        rlvAlertBox.classList.add('hidden');
+      }
+    }
     
     byId('rlvPerLot').textContent = formatCurrency(rlvPerLot);
     if (byId('developerProfit')) byId('developerProfit').textContent = formatCurrency(c.developerMargin);
@@ -216,6 +233,17 @@
     if (byId('ltc')) byId('ltc').textContent = ltc != null ? ltc.toFixed(1) + '%' : '—';
     if (byId('dcr')) byId('dcr').textContent = dcr != null ? dcr.toFixed(2) + 'x' : '—';
     if (byId('netValueCreated')) byId('netValueCreated').textContent = formatCurrency(netValueCreated);
+    var lvrStressFill = byId('lvrStressBarFill');
+    var lvrStressLabel = byId('lvrStressBarLabel');
+    if (lvrStressFill && lvrStressLabel) {
+      var lvrPct = ltv != null ? Math.min(100, Math.max(0, ltv)) : 0;
+      lvrStressFill.style.width = lvrPct + '%';
+      lvrStressFill.classList.remove('lvr-green', 'lvr-yellow', 'lvr-red');
+      if (lvrPct < 65) lvrStressFill.classList.add('lvr-green');
+      else if (lvrPct <= 75) lvrStressFill.classList.add('lvr-yellow');
+      else lvrStressFill.classList.add('lvr-red');
+      lvrStressLabel.textContent = ltv != null ? ltv.toFixed(1) : '0';
+    }
 
     byId('b-gdv').textContent = formatCurrency(i.gdv);
     byId('b-construction').textContent = '−' + formatCurrency(i.constructionCost);
@@ -288,8 +316,31 @@
       };
       var rlvAlt = calcRLV(gdvAlt, i.constructionCost, cAlt, i.otherCosts);
       byId(grossSalesKeys[idx]).textContent = formatCurrency(gdvAlt);
-      byId(rlvKeys[idx]).textContent = formatCurrency(rlvAlt);
+      var rlvCell = byId(rlvKeys[idx]);
+      if (rlvCell) {
+        rlvCell.textContent = formatCurrency(rlvAlt);
+        rlvCell.setAttribute('data-rlv', String(rlvAlt));
+      }
     });
+    var rlvCells = document.querySelectorAll('.sensitivity-rlv-cell');
+    if (rlvCells.length) {
+      var rlvVals = [];
+      rlvCells.forEach(function (cell) {
+        var v = parseFloat(cell.getAttribute('data-rlv')) || 0;
+        rlvVals.push(v);
+      });
+      var rlvMin = Math.min.apply(null, rlvVals);
+      var rlvMax = Math.max.apply(null, rlvVals);
+      var rlvRange = rlvMax - rlvMin || 1;
+      rlvCells.forEach(function (cell, idx) {
+        var v = rlvVals[idx];
+        var t = (v - rlvMin) / rlvRange;
+        var r = Math.round(220 * (1 - t) + 34 * t);
+        var g = Math.round(38 * (1 - t) + 197 * t);
+        var b = Math.round(38 * (1 - t) + 94 * t);
+        cell.style.backgroundColor = 'rgba(' + r + ',' + g + ',' + b + ',0.35)';
+      });
+    }
   }
 
   var debouncedUpdate = debounce(update, 300);
@@ -298,7 +349,24 @@
   // avgSalePrice/lotsExpectedToSell affect sales & marketing and developer margin)
   var immediateUpdateFields = ['professionalFeesPct', 'contingencyPct', 'salesMarketingPct', 'developerMarginPct', 'constructionCost', 'avgSalePrice', 'lotsExpectedToSell', 'numLots'];
   
+  var projectNameEl = byId('projectName');
+  if (projectNameEl) {
+    projectNameEl.addEventListener('input', updateResultsProjectNameDisplay);
+    projectNameEl.addEventListener('change', updateResultsProjectNameDisplay);
+  }
+
   var inputs = ['currentLandValue', 'totalGRV', 'numLots', 'lotsExpectedToSell', 'avgSalePrice', 'constructionCost', 'professionalFeesPct', 'constructionAmountRequired', 'interestRatePct', 'constructionPeriodMonths', 'facilityTermMonths', 'salesMarketingPct', 'contingencyPct', 'otherCosts', 'developerMarginPct'];
+
+  function clearAll() {
+    var pn = byId('projectName');
+    if (pn) pn.value = '';
+    inputs.forEach(function (id) {
+      var el = byId(id);
+      if (el) el.value = '0';
+    });
+    update();
+  }
+
   inputs.forEach(function (id) {
     var el = byId(id);
     if (el) {
@@ -364,7 +432,7 @@
       
       newIcon.setAttribute('role', 'button');
       newIcon.setAttribute('aria-label', 'Show help information');
-      newIcon.setAttribute('tabindex', '0');
+      newIcon.setAttribute('tabindex', '-1');
       newIcon.style.cursor = 'pointer';
       
       newIcon.addEventListener('click', function(e) {
@@ -465,6 +533,11 @@
     exportPdfBtn.addEventListener('click', exportToPDF);
   }
 
+  var clearAllBtn = byId('clearAllBtn');
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', clearAll);
+  }
+
   function exportToPDF() {
     var JsPDF = window.jspdf.jsPDF || window.jspdf.default;
     if (!JsPDF) {
@@ -477,6 +550,9 @@
     var PAGE_WIDTH = 210;
     var PAGE_HEIGHT = 297;
     var CONTENT_WIDTH = PAGE_WIDTH - (MARGIN * 2);
+    var FOOTER_HEIGHT = 32;
+    var CONTENT_BOTTOM = PAGE_HEIGHT - FOOTER_HEIGHT;
+    var SECTION_HEADER_HEIGHT = 6;
     var y = MARGIN;
 
     function val(id) {
@@ -506,31 +582,98 @@
       return text;
     }
 
+    function drawHeader(doc, headerHeight) {
+      headerHeight = headerHeight || 14;
+      doc.setFillColor(0, 0, 0);
+      doc.rect(0, 0, PAGE_WIDTH, headerHeight, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Mercer Funding Group', MARGIN, headerHeight - 4);
+    }
+
+    function drawFooter(doc) {
+      var footerY = PAGE_HEIGHT - FOOTER_HEIGHT;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
+      doc.line(MARGIN, footerY, PAGE_WIDTH - MARGIN, footerY);
+      footerY += 5;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 0, 0);
+      doc.text('mercerfg.com.au', PAGE_WIDTH - MARGIN, footerY, { align: 'right' });
+      var disclaimer = 'Disclaimer: This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions. Results are shown on a pre-tax basis. GST and income tax obligations are not included and will substantially impact the final net position.';
+      var disclaimerLines = doc.splitTextToSize(disclaimer, CONTENT_WIDTH);
+      footerY += 5;
+      disclaimerLines.forEach(function(line) {
+        doc.text(line, MARGIN, footerY);
+        footerY += 4;
+      });
+    }
+
     function ensurePage(doc, y) {
-      if (y > PAGE_HEIGHT - 30) {
+      if (y > CONTENT_BOTTOM) {
+        drawFooter(doc);
         doc.addPage();
-        // Draw header on new page
-        doc.setFillColor(0, 43, 91);
-        var headerHeight = 14;
-        doc.rect(0, 0, PAGE_WIDTH, headerHeight, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(10);
-        doc.text('Mercer Funding Group', MARGIN, headerHeight - 4);
-        return MARGIN + 5;
+        drawHeader(doc, 14);
+        return 20;
       }
       return y;
     }
 
-    function sectionTitle(doc, title, y) {
+    function ensureSpaceFor(doc, y, neededMm) {
+      if (y + neededMm > CONTENT_BOTTOM) {
+        drawFooter(doc);
+        doc.addPage();
+        drawHeader(doc, 14);
+        return 20;
+      }
+      return y;
+    }
+
+    function sectionTitleBox(doc, title, y) {
       y = ensurePage(doc, y);
-      doc.setTextColor(0, 43, 91);
-      doc.setFontSize(12);
+      var boxY = y;
+      doc.setFillColor(0, 0, 0);
+      doc.rect(MARGIN, boxY, CONTENT_WIDTH, SECTION_HEADER_HEIGHT, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text(title, MARGIN, y);
-      doc.setLineWidth(0.5);
-      doc.setDrawColor(0, 43, 91);
-      doc.line(MARGIN, y + 1, MARGIN + 40, y + 1);
-      return y + 6;
+      var label = (title || '').toUpperCase();
+      doc.text(label, MARGIN + 4, boxY + SECTION_HEADER_HEIGHT - 1.8);
+      return boxY + SECTION_HEADER_HEIGHT + 4;
+    }
+
+    function drawDottedRows(doc, rows, startY) {
+      var rowY = startY;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.1);
+      if (typeof doc.setLineDash === 'function') {
+        doc.setLineDash([1, 2]);
+      }
+      for (var r = 0; r < rows.length; r++) {
+        var label = rows[r][0];
+        var value = rows[r][1] || '—';
+        doc.setFont('helvetica', 'normal');
+        doc.text(label, MARGIN, rowY);
+        var labelW = doc.getTextWidth ? doc.getTextWidth(label) : 60;
+        doc.setFont('helvetica', 'bold');
+        var valueW = doc.getTextWidth ? doc.getTextWidth(value) : 40;
+        var lineStart = MARGIN + labelW + 3;
+        var lineEnd = MARGIN + CONTENT_WIDTH - valueW - 3;
+        if (lineEnd > lineStart) {
+          doc.line(lineStart, rowY + 1.2, lineEnd, rowY + 1.2);
+        }
+        doc.text(value, MARGIN + CONTENT_WIDTH, rowY, { align: 'right' });
+        rowY += 6;
+      }
+      if (typeof doc.setLineDash === 'function') {
+        doc.setLineDash([]);
+      }
+      return rowY;
     }
 
     function runAutoTable(doc, opts) {
@@ -541,15 +684,11 @@
       opts.styles.overflow = 'linebreak';
       if (!opts.tableWidth) opts.tableWidth = CONTENT_WIDTH;
       if (!opts.columnStyles) opts.columnStyles = {};
-      // Align header cells with their column so "Value", "Gross Sales", "RLV", "Amount" match right-aligned values
+      opts.tableLineWidth = 0.1;
+      opts.tableLineColor = [200, 200, 200];
+      opts.drawVerticalLine = function() { return false; };
       var existingDidParseCell = opts.didParseCell;
       opts.didParseCell = function(data) {
-        if (data.section === 'head') {
-          var colStyle = opts.columnStyles[data.column.index];
-          if (colStyle && colStyle.halign) {
-            data.cell.styles.halign = colStyle.halign;
-          }
-        }
         if (existingDidParseCell) existingDidParseCell(data);
       };
       if (typeof doc.autoTable === 'function') {
@@ -561,32 +700,14 @@
       }
     }
 
-    // Title block
-    var projectName = byId('projectName') ? byId('projectName').value.trim() : '';
-    var titleText = projectName 
-      ? 'Property Development Feasibility Summary - ' + projectName
-      : 'Property Development Feasibility Summary';
-    
-    var titleLines = doc.splitTextToSize(titleText, CONTENT_WIDTH);
-    var titleLineHeight = 7.5;
-    var headerHeight = (titleLines.length * titleLineHeight) + 8;
-    
-    doc.setFillColor(0, 43, 91);
-    doc.rect(0, 0, PAGE_WIDTH, headerHeight, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    
-    var currentY = 6;
-    for (var i = 0; i < titleLines.length; i++) {
-      doc.text(titleLines[i], MARGIN, currentY);
-      currentY += titleLineHeight;
-    }
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Mercer Funding Group', MARGIN, headerHeight - 4);
-    
+    // First page: two-row black header – row 1: Mercer (left) + Generated (right); row 2: title only (no overlap)
+    var projectNameEl = byId('projectName');
+    var projectName = (projectNameEl && projectNameEl.value != null)
+      ? String(projectNameEl.value).trim()
+      : '';
+    var titleText = projectName.length > 0
+      ? 'Pre-Tax Property Development Feasibility Summary - ' + projectName
+      : 'Pre-Tax Property Development Feasibility Summary';
     var now = new Date();
     var day = String(now.getDate()).padStart(2, '0');
     var month = String(now.getMonth() + 1).padStart(2, '0');
@@ -600,85 +721,90 @@
     hours12 = String(hours12).padStart(2, '0');
     var dateStr = day + '/' + month + '/' + year;
     var timeStr = hours12 + ':' + minutes + ':' + seconds + ' ' + ampm;
-    doc.text('Generated: ' + dateStr + ', ' + timeStr, PAGE_WIDTH - MARGIN, headerHeight - 4, { align: 'right' });
-    
+    var titleLines = doc.splitTextToSize(titleText, CONTENT_WIDTH);
+    var headerTopPad = 12;
+    var headerPad = 6;
+    var headerTitleLineHeight = 6;
+    var headerTitleBlock = titleLines.length * headerTitleLineHeight;
+    var headerMetaBlock = 6;
+    var headerHeight = headerTopPad + headerTitleBlock + headerPad + headerMetaBlock + headerPad;
+    doc.setFillColor(0, 0, 0);
+    doc.rect(0, 0, PAGE_WIDTH, headerHeight, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    var titleY = headerTopPad + headerTitleBlock / 2 + 1.5;
+    doc.text(titleLines, MARGIN + CONTENT_WIDTH / 2, titleY, { align: 'center' });
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    var metaY = headerHeight - headerPad - 2;
+    doc.text('Mercer Funding Group', MARGIN, metaY);
+    doc.text('Generated: ' + dateStr + ', ' + timeStr, PAGE_WIDTH - MARGIN, metaY, { align: 'right' });
     y = headerHeight + 10;
 
-    // Project Summary
-    y = sectionTitle(doc, 'Project Summary', y);
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Metric', 'Value']],
-      body: [
-        ['Current Market Value (As-Is)', val('startingValue')],
-        ['On-Completion Value (As-Complete)', val('endValue')],
-        ['Gross Sales', val('gdv')]
-      ],
-      theme: 'plain',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right' } },
-      styles: { fontSize: 9, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
+    // Project Summary – boxed header, dotted leader rows, values right-aligned
+    y = sectionTitleBox(doc, 'Project Summary', y);
+    y = drawDottedRows(doc, [
+      ['Current Market Value (As-Is)', val('startingValue')],
+      ['On-Completion Value (As-Complete)', val('endValue')],
+      ['Gross Sales', val('gdv')]
+    ], y);
+    y += 8;
 
-    // Project Health
-    y = sectionTitle(doc, 'Project Health', y);
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Metric', 'Value']],
-      body: [
-        ['Forecast LVR (Loan/GRV)', val('ltv')],
-        ['Loan to Cost (LTC)', val('ltc')],
-        ['Debt Coverage Ratio (DCR)', val('dcr')]
-      ],
-      theme: 'plain',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right' } },
-      styles: { fontSize: 9, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
+    // Project Health – scorecard: three equal columns, each with light-gray bordered box and large value
+    y = sectionTitleBox(doc, 'Project Health', y);
+    var colW = CONTENT_WIDTH / 3;
+    var scorecardH = 22;
+    var healthLabels = ['LVR', 'LTC', 'DCR'];
+    var healthValues = [val('ltv'), val('ltc'), val('dcr')];
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    for (var h = 0; h < 3; h++) {
+      var boxX = MARGIN + colW * h + 2;
+      var boxW = colW - 4;
+      doc.rect(boxX, y, boxW, scorecardH, 'S');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(80, 80, 80);
+      doc.text(healthLabels[h], boxX + boxW / 2, y + 6, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(healthValues[h] || '—', boxX + boxW / 2, y + scorecardH / 2 + 2, { align: 'center' });
+    }
+    y += scorecardH + 8;
 
-    // Profitability
-    y = sectionTitle(doc, 'Profitability', y);
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Metric', 'Value']],
-      body: [
-        ['Net Value Creation', val('netValueCreated')],
-        ['Return on Equity (ROE)', val('roe')],
-        ['Profit margin %', val('profitMarginPct')],
-        ['Developer profit', val('developerProfit')],
-        ['RLV per lot', val('rlvPerLot')]
-      ],
-      theme: 'plain',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right' } },
-      styles: { fontSize: 9, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
+    // Profitability – boxed header, dotted leader rows, values right-aligned
+    y = sectionTitleBox(doc, 'Profitability', y);
+    y = drawDottedRows(doc, [
+      ['Net Value Creation', val('netValueCreated')],
+      ['Return on Equity (ROE)', val('roe')],
+      ['Profit margin %', val('profitMarginPct')],
+      ['Developer profit', val('developerProfit')],
+      ['RLV per lot', val('rlvPerLot')]
+    ], y);
+    y += 8;
 
-    // The Bottom Line
-    y = sectionTitle(doc, 'The Bottom Line', y);
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Metric', 'Value']],
-      body: [
-        ['Residual Land Value (RLV)', val('rlv')]
-      ],
-      theme: 'plain',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      bodyStyles: { fillColor: [240, 240, 240], textColor: [0, 43, 91], fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right' } },
-      styles: { fontSize: 11, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
+    // The Bottom Line – hero box: light gray fill, black border, centered RLV at 20pt bold (most prominent)
+    y = sectionTitleBox(doc, 'The Bottom Line', y);
+    var boxH = 28;
+    doc.setFillColor(240, 240, 240);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, boxH, 'F');
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.8);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, boxH, 'S');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    doc.text('Residual Land Value (RLV)', MARGIN + CONTENT_WIDTH / 2, y + 8, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.setTextColor(0, 0, 0);
+    doc.text(val('rlv') || '—', MARGIN + CONTENT_WIDTH / 2, y + 20, { align: 'center' });
+    y += boxH + 8;
 
-    // Breakdown
-    y = sectionTitle(doc, 'Breakdown', y);
+    // Breakdown – boxed header, dotted leader rows
+    y = sectionTitleBox(doc, 'Breakdown', y);
     var breakdownBody = [
       ['Gross Sales', val('b-gdv')]
     ];
@@ -704,7 +830,7 @@
     // Add establishment fee if it exists
     var fundingFeeVal = val('b-funding-fee');
     if (fundingFeeVal && fundingFeeVal !== '$0' && fundingFeeVal !== '-$0') {
-      breakdownBody.push(['Establishment fee (3%)', fundingFeeVal]);
+      breakdownBody.push(['Establishment fee (Est.)', fundingFeeVal]);
     }
     
     // Add sales & marketing
@@ -733,80 +859,58 @@
     
     // Add RLV
     breakdownBody.push(['Residual Land Value', val('b-rlv')]);
-    
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Item', 'Amount']],
-      body: breakdownBody,
-      theme: 'striped',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right', font: 'helvetica' } },
-      styles: { fontSize: 9, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
 
-    // Net Settlement Position
-    y = sectionTitle(doc, 'Net Settlement Position', y);
+    y = drawDottedRows(doc, breakdownBody, y);
+    y += 8;
+
+    // Net Settlement Position – ensure room so table never hits footer; boxed header, dotted rows
+    y = ensureSpaceFor(doc, y, 50);
+    y = sectionTitleBox(doc, 'Net Settlement Position', y);
+    var settlementBody = [
+      ['Gross Sales', val('settlement-gross-sales')],
+      ['Less Selling Costs', val('settlement-selling-costs')],
+      ['Less Facility Repayment', val('settlement-facility')],
+      ['Less Other Costs', val('settlement-other-costs')],
+      ['Cash Result', val('settlement-cash-result')]
+    ];
+    y = drawDottedRows(doc, settlementBody, y);
+    y += 8;
+
+    // Sensitivity Analysis – force new page if needed so section never runs into footer; heatmap
+    y = ensureSpaceFor(doc, y, 55);
+    y = sectionTitleBox(doc, 'Sensitivity Analysis', y);
+    var sensBody = [
+      ['-10%', val('s-gdv-m10'), val('s-rlv-m10')],
+      ['-5%', val('s-gdv-m5'), val('s-rlv-m5')],
+      ['Base', val('s-gdv-base'), val('s-rlv-base')],
+      ['+5%', val('s-gdv-p5'), val('s-rlv-p5')],
+      ['+10%', val('s-gdv-p10'), val('s-rlv-p10')]
+    ];
     runAutoTable(doc, {
       startY: y,
-      head: [['Item', 'Amount']],
-      body: [
-        ['Gross Sales', val('settlement-gross-sales')],
-        ['Less Selling Costs', val('settlement-selling-costs')],
-        ['Less Facility Repayment', val('settlement-facility')],
-        ['Less Other Costs', val('settlement-other-costs')],
-        ['Cash Result', val('settlement-cash-result')]
-      ],
+      body: sensBody,
       theme: 'plain',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 60, halign: 'right', font: 'helvetica' } },
-      styles: { fontSize: 9, font: 'helvetica' },
-      margin: { left: MARGIN, right: MARGIN }
-    });
-    y = doc.lastAutoTable.finalY + 8;
-
-    // Sensitivity Analysis
-    y = sectionTitle(doc, 'Sensitivity Analysis', y);
-    runAutoTable(doc, {
-      startY: y,
-      head: [['Price Movement', 'Gross Sales', 'RLV']],
-      body: [
-        ['-10%', val('s-gdv-m10'), val('s-rlv-m10')],
-        ['-5%', val('s-gdv-m5'), val('s-rlv-m5')],
-        ['Base', val('s-gdv-base'), val('s-rlv-base')],
-        ['+5%', val('s-gdv-p5'), val('s-rlv-p5')],
-        ['+10%', val('s-gdv-p10'), val('s-rlv-p10')]
-      ],
-      theme: 'striped',
-      headStyles: { fillColor: [0, 43, 91], textColor: 255, fontStyle: 'bold', font: 'helvetica' },
-      columnStyles: { 
-        0: { cellWidth: 45, font: 'helvetica' }, 
-        1: { cellWidth: 67.5, halign: 'right', font: 'helvetica' }, 
-        2: { cellWidth: 67.5, halign: 'right', font: 'helvetica' } 
+      showHead: 'never',
+      columnStyles: {
+        0: { cellWidth: 45, fontStyle: 'normal' },
+        1: { cellWidth: 67.5, halign: 'right', fontStyle: 'bold' },
+        2: { cellWidth: 67.5, halign: 'right', fontStyle: 'bold' }
+      },
+      didParseCell: function(data) {
+        if (data.column.index === 2) {
+          var raw = (data.cell.raw && data.cell.raw.toString()) || '';
+          var isNegative = /^[-−]/.test(raw);
+          data.cell.styles.fillColor = isNegative ? [255, 220, 220] : [220, 255, 220];
+        }
       },
       styles: { fontSize: 9, font: 'helvetica' },
       margin: { left: MARGIN, right: MARGIN }
     });
     y = doc.lastAutoTable.finalY + 12;
 
-    // Footer
-    y = ensurePage(doc, y);
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    var footerText = 'Disclaimer: This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions.';
-    var footerLines = doc.splitTextToSize(footerText, CONTENT_WIDTH);
-    footerLines.forEach(function(line) {
-      y = ensurePage(doc, y);
-      doc.text(line, MARGIN, y);
-      y += 4;
-    });
-    
-    y = ensurePage(doc, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Mercer Funding Group | mercerfg.com.au', PAGE_WIDTH / 2, y, { align: 'center' });
+    // Footer on last page (every page already gets footer when we add a new page via ensurePage)
+    drawFooter(doc);
 
-    doc.save((projectName || 'feasibility-summary') + '.pdf');
+    doc.save((projectName.length > 0 ? projectName : 'feasibility-summary') + '.pdf');
   }
 })();

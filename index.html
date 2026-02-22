@@ -4,23 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Property Development Feasibility Calculator | Mercer Funding Group</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            mercer: { black: '#000000', white: '#FFFFFF', sky: '#2297D0', border: '#E5E7EB' }
+          },
+          borderRadius: { xl: '1rem' }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="app">
-    <header class="header">
-      <div class="header-content">
-        <div class="logo-container">
-          <img src="assets/mfg-logo.png" alt="Mercer Funding Group" class="logo" id="mfg-logo">
+<body class="font-sans antialiased bg-white text-black">
+  <div class="app max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-6 py-8">
+    <header class="header border-b-2 border-black mb-10 pb-8">
+      <div class="flex flex-wrap items-center gap-8">
+        <div class="flex-shrink-0">
+          <img src="assets/mfg-logo.png" alt="Mercer Funding Group" class="logo max-w-[180px] h-auto block" id="mfg-logo">
         </div>
-        <div class="header-text">
-          <h1>Property Development Feasibility Calculator</h1>
-          <p class="tagline">Estimate your Residual Land Value and start your project journey.</p>
+        <div class="flex-1 min-w-[280px]">
+          <h1 class="text-xl sm:text-2xl font-bold text-black m-0">Property Development Feasibility Calculator</h1>
+          <p class="tagline text-gray-600 mt-1 mb-0">Estimate your Residual Land Value and start your project journey.</p>
         </div>
-        <div class="header-actions">
-          <div class="help-control">
-            <span class="help-label">Help</span>
-            <button type="button" class="help-btn" id="helpBtn" aria-label="Open help panel">
+        <div class="flex items-center ml-auto">
+          <div class="help-control flex items-center gap-2">
+            <span class="help-label text-sm font-medium text-black">Help</span>
+            <button type="button" class="help-btn p-2 rounded-lg border border-mercer-border hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2" id="helpBtn" aria-label="Open help panel">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -32,18 +49,20 @@
       </div>
     </header>
 
-    <div class="main">
-      <div class="main-left">
-        <section class="inputs-section card">
-          <h2>Project inputs</h2>
-          
-          <div class="project-name-block">
-            <label for="projectName">Project name</label>
-            <input type="text" id="projectName" placeholder="e.g. Smith Street Development">
+    <div class="main grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+      <div class="main-left lg:col-span-6 xl:col-span-6 panel-column panel-inputs pt-6">
+        <div class="panel-header-bar panel-header-inputs">
+          <span class="panel-title">Project inputs</span>
+          <button type="button" class="clear-all-btn px-4 py-2 text-sm font-semibold text-black bg-white border border-white rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-colors" id="clearAllBtn">Clear all</button>
+        </div>
+        <section class="inputs-section card mercer-card mt-4">
+          <div class="project-name-block mb-6">
+            <label for="projectName" class="block">Project name</label>
+            <input type="text" id="projectName" placeholder="e.g. Smith Street Development" class="mercer-input w-full">
           </div>
 
-          <div class="input-group">
-            <h2>Project value &amp; revenue</h2>
+          <div class="input-group mercer-card-inner">
+            <h2 class="input-group-title">Project value &amp; revenue</h2>
             <div class="input-row">
               <label for="currentLandValue">
                 Current land value $
@@ -94,8 +113,8 @@
             </div>
           </div>
 
-          <div class="input-group">
-            <h2>Costs</h2>
+          <div class="input-group mercer-card-inner mt-6">
+            <h2 class="input-group-title">Costs</h2>
             <div class="input-row">
               <label for="constructionCost">Construction cost (total) $</label>
               <input type="number" id="constructionCost" value="0" min="0" step="1000">
@@ -139,8 +158,8 @@
             </div>
           </div>
 
-          <div class="input-group funding">
-            <h2>
+          <div class="input-group funding mercer-card-inner mt-6">
+            <h2 class="input-group-title">
               Funding
               <span class="tooltip-wrapper">
                 <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -149,78 +168,29 @@
                   <line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>
                 <div class="tooltip-content">
-                  <p>Enter net construction amount required (excluding fees and interest reserve). The calculator will determine the facility size needed.</p>
+                  <p>Enter net construction amount required (excluding fees and interest reserve). The calculator will determine the facility size needed. See the Help guide for full details.</p>
                 </div>
               </span>
             </h2>
-            <p class="funding-description">Enter net construction amount required; facility size will be calculated to cover construction, interest, and a 3% establishment fee. During construction we assume 55% average draw; after construction the full amount is outstanding until facility end. Facility term must be ≥ construction period.</p>
-            
+
             <div class="funding-inputs-grid">
               <div class="funding-input-item">
-                <label for="constructionAmountRequired">
-                  Construction amount required (net) $
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>The actual construction amount you need to borrow (before interest and fees).</p>
-                    </div>
-                  </span>
-                </label>
+                <label for="constructionAmountRequired">Construction amount required (net) $</label>
                 <input type="number" id="constructionAmountRequired" value="0" min="0" step="1000">
               </div>
               
               <div class="funding-input-item">
-                <label for="interestRatePct">
-                  Interest rate % p.a.
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>Private lender interest rate per annum. Typical range: 8-15% p.a.</p>
-                    </div>
-                  </span>
-                </label>
+                <label for="interestRatePct">Interest rate % p.a.</label>
                 <input type="number" id="interestRatePct" value="0" min="0" max="100" step="0.1" class="input-narrow">
               </div>
               
               <div class="funding-input-item">
-                <label for="constructionPeriodMonths">
-                  Construction period (months)
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>How long construction will take from start to completion.</p>
-                    </div>
-                  </span>
-                </label>
+                <label for="constructionPeriodMonths">Construction period (months)</label>
                 <input type="number" id="constructionPeriodMonths" value="0" min="1" step="1" class="input-narrow">
               </div>
               
               <div class="funding-input-item">
-                <label for="facilityTermMonths">
-                  Facility term (months)
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>Total duration of the facility including construction and sales period.</p>
-                    </div>
-                  </span>
-                </label>
+                <label for="facilityTermMonths">Facility term (months)</label>
                 <input type="number" id="facilityTermMonths" value="0" min="1" step="1" class="input-narrow">
               </div>
             </div>
@@ -260,7 +230,7 @@
               </div>
               <div class="row computed" id="fundingFeeDisplay" style="display: none;">
                 <span class="label">
-                  Establishment fee
+                  Establishment Fee (Est.)
                   <span class="tooltip-wrapper">
                     <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
@@ -277,8 +247,8 @@
             </div>
           </div>
 
-          <div class="input-group">
-            <h2>Profit</h2>
+          <div class="input-group mercer-card-inner">
+            <h2 class="input-group-title">Profit</h2>
             <div class="input-row">
               <label for="developerMarginPct">
                 Developer margin — % of Gross Sales
@@ -302,16 +272,14 @@
         </section>
       </div>
 
-      <div class="main-right">
-        <section class="results-section card">
-          <h2>Results</h2>
-          
-          <div class="export-actions">
-            <button type="button" class="btn btn-secondary" id="exportPdfBtn">Export to PDF</button>
-          </div>
-
-          <div class="project-summary card-inner">
-            <h2>Project Summary</h2>
+      <div class="main-right lg:col-span-6 xl:col-span-6 lg:sticky lg:top-8 lg:self-start max-h-[calc(100vh-4rem)] overflow-y-auto panel-column panel-results pt-6">
+        <div class="panel-header-bar panel-header-results">
+          <span class="panel-title">Pre-tax Feasibility Summary</span>
+          <button type="button" class="mercer-cta-btn export-in-header px-4 py-2 bg-white text-black font-semibold rounded-lg border border-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-colors" id="exportPdfBtn">Export to PDF</button>
+        </div>
+        <section class="results-section card mercer-card mt-4">
+          <div class="project-summary card-inner mercer-card-inner">
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-black mb-3">Project Summary</h2>
             <div class="results-grid-compact">
               <div class="result-item">
                 <span class="result-label">Current Market Value (As-Is)</span>
@@ -328,44 +296,37 @@
             </div>
           </div>
 
-          <div class="results-group">
-            <h3 class="group-title">Project Health</h3>
+          <!-- LVR Stress Bar -->
+          <div class="lvr-stress-bar-container mercer-card-inner mt-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-black mb-2">LVR stress</p>
+            <div class="lvr-stress-bar-track h-3 rounded-full bg-gray-200 overflow-hidden" aria-hidden="true">
+              <div class="lvr-stress-bar-fill h-full rounded-full transition-all duration-300" id="lvrStressBarFill" style="width: 0%;"></div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1"><span id="lvrStressBarLabel">0%</span> LVR</p>
+          </div>
+
+          <!-- Bento Grid: Forecast LVR, LTC, Net Value Creation -->
+          <div class="bento-grid grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+            <div class="bento-card mercer-card-inner p-4 min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Forecast LVR</p>
+              <p class="text-lg font-bold tabular-nums text-black truncate" id="ltv">—</p>
+            </div>
+            <div class="bento-card mercer-card-inner p-4 min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Loan to Cost</p>
+              <p class="text-lg font-bold tabular-nums text-black truncate" id="ltc">—</p>
+            </div>
+            <div class="bento-card mercer-card-inner p-4 min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Net Value Creation</p>
+              <p class="text-lg font-bold tabular-nums text-black break-words overflow-hidden" id="netValueCreated">$0</p>
+            </div>
+          </div>
+
+          <div class="results-group mercer-card-inner mt-4">
+            <h3 class="group-title">Debt Coverage Ratio</h3>
             <div class="results-grid-compact">
               <div class="result-item">
                 <span class="result-label">
-                  Forecast LVR (Loan/GRV)
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>Loan to Value Ratio calculated against the total GRV (as-completed value).</p>
-                    </div>
-                  </span>
-                </span>
-                <span class="result-value" id="ltv">—</span>
-              </div>
-              <div class="result-item">
-                <span class="result-label">
-                  Loan to Cost (LTC)
-                  <span class="tooltip-wrapper">
-                    <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                    <div class="tooltip-content">
-                      <p>Shows what percentage of total project cost (land + construction) is being financed.</p>
-                    </div>
-                  </span>
-                </span>
-                <span class="result-value" id="ltc">—</span>
-              </div>
-              <div class="result-item">
-                <span class="result-label">
-                  Debt Coverage Ratio (DCR)
+                  DCR (Gross Sales / Facility)
                   <span class="tooltip-wrapper">
                     <svg class="tooltip-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
@@ -377,18 +338,14 @@
                     </div>
                   </span>
                 </span>
-                <span class="result-value" id="dcr">—</span>
+                <span class="result-value tabular-nums" id="dcr">—</span>
               </div>
             </div>
           </div>
 
-          <div class="results-group">
+          <div class="results-group mercer-card-inner mt-4">
             <h3 class="group-title">Profitability</h3>
             <div class="results-grid-compact">
-              <div class="result-item">
-                <span class="result-label">Net Value Creation</span>
-                <span class="result-value" id="netValueCreated">$0</span>
-              </div>
               <div class="result-item">
                 <span class="result-label">Return on Equity (ROE)</span>
                 <span class="result-value" id="roe">—</span>
@@ -408,7 +365,12 @@
             </div>
           </div>
 
-          <div class="results-group">
+          <!-- RLV Feasibility Alert (shown when RLV < land value) -->
+          <div class="rlv-alert hidden border-2 border-red-600 bg-red-50 text-red-800 rounded-xl p-4 mt-4" id="rlvAlertBox" role="alert">
+            <p class="font-semibold m-0">Warning: Project may be unfeasible — RLV below land value.</p>
+          </div>
+
+          <div class="results-group mercer-card-inner mt-4">
             <h3 class="group-title">The Bottom Line</h3>
             <div class="result-item-hero">
               <div class="result-item primary">
@@ -425,16 +387,16 @@
                     </div>
                   </span>
                 </span>
-                <span class="result-value" id="rlv">$0</span>
-                <span class="result-hint" id="rlv-hint">Maximum you should pay for the site</span>
+                <span class="result-value tabular-nums" id="rlv">$0</span>
+                <span class="result-hint text-sm text-gray-500" id="rlv-hint">Maximum you should pay for the site</span>
               </div>
             </div>
           </div>
 
           <div class="results-details-section">
-            <button type="button" class="toggle-btn results-details-toggle" id="resultsDetailsToggle" aria-expanded="true" aria-controls="resultsDetailsContent">
-              <span>Breakdown &amp; details</span>
-              <svg class="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
+            <button type="button" class="toggle-btn results-details-toggle panel-header-bar" id="resultsDetailsToggle" aria-expanded="true" aria-controls="resultsDetailsContent">
+              <span class="results-details-title-text">Breakdown &amp; details</span>
+              <svg class="toggle-icon flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
@@ -460,7 +422,7 @@
                       <td id="b-finance">−$0</td>
                     </tr>
                     <tr id="b-funding-fee-row" style="display: none;">
-                      <td>Less Funding Fee</td>
+                      <td>Establishment fee (Est.)</td>
                       <td id="b-funding-fee">−$0</td>
                     </tr>
                     <tr>
@@ -527,28 +489,28 @@
                   <tbody>
                     <tr>
                       <td>−10%</td>
-                      <td id="s-gdv-m10">$0</td>
-                      <td id="s-rlv-m10">$0</td>
+                      <td class="tabular-nums" id="s-gdv-m10">$0</td>
+                      <td class="sensitivity-rlv-cell tabular-nums" id="s-rlv-m10" data-rlv="">$0</td>
                     </tr>
                     <tr>
                       <td>−5%</td>
-                      <td id="s-gdv-m5">$0</td>
-                      <td id="s-rlv-m5">$0</td>
+                      <td class="tabular-nums" id="s-gdv-m5">$0</td>
+                      <td class="sensitivity-rlv-cell tabular-nums" id="s-rlv-m5" data-rlv="">$0</td>
                     </tr>
                     <tr class="base">
                       <td>Base</td>
-                      <td id="s-gdv-base">$0</td>
-                      <td id="s-rlv-base">$0</td>
+                      <td class="tabular-nums" id="s-gdv-base">$0</td>
+                      <td class="sensitivity-rlv-cell tabular-nums" id="s-rlv-base" data-rlv="">$0</td>
                     </tr>
                     <tr>
                       <td>+5%</td>
-                      <td id="s-gdv-p5">$0</td>
-                      <td id="s-rlv-p5">$0</td>
+                      <td class="tabular-nums" id="s-gdv-p5">$0</td>
+                      <td class="sensitivity-rlv-cell tabular-nums" id="s-rlv-p5" data-rlv="">$0</td>
                     </tr>
                     <tr>
                       <td>+10%</td>
-                      <td id="s-gdv-p10">$0</td>
-                      <td id="s-rlv-p10">$0</td>
+                      <td class="tabular-nums" id="s-gdv-p10">$0</td>
+                      <td class="sensitivity-rlv-cell tabular-nums" id="s-rlv-p10" data-rlv="">$0</td>
                     </tr>
                   </tbody>
                 </table>
@@ -556,28 +518,32 @@
             </div>
           </div>
         </section>
+        <div class="results-pre-tax-note mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <p class="text-sm font-medium text-amber-900 m-0"><strong>Note:</strong> All figures are calculated pre-tax. GST and Income Tax are not accounted for and will reduce the final cash result.</p>
+        </div>
       </div>
     </div>
 
-    <section class="cta-section">
-      <h2>Want a detailed feasibility and funding options?</h2>
-      <p>Talk to Mercer Funding Group for specialist access to private lenders and non-bank finance.</p>
-      <a href="https://calendly.com/enquiries-w4n0/15mins?month=2026-02" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-call">Book a call with a specialist</a>
-      <p class="cta-separator">or submit your details and we'll be in touch:</p>
-      <form action="https://www.mercerfg.com.au/contact" method="get" class="cta-form">
-        <div class="form-row">
-          <input type="text" name="name" placeholder="Your name" required>
-          <input type="email" name="email" placeholder="Email" required>
+    <section class="cta-section mt-12 pt-10 border-t border-mercer-border">
+      <h2 class="text-xl font-bold text-black mt-0 mb-2">Want a detailed feasibility and funding options?</h2>
+      <p class="text-gray-600 mb-6">Talk to Mercer Funding Group for specialist access to private lenders and non-bank finance.</p>
+      <a href="https://calendly.com/enquiries-w4n0/15mins?month=2026-02" target="_blank" rel="noopener noreferrer" class="mercer-cta-btn inline-block px-6 py-3 bg-black text-white font-semibold rounded-xl border border-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-all duration-200 no-underline">Book a call with a specialist</a>
+      <p class="cta-separator text-gray-600 my-4">or submit your details and we'll be in touch:</p>
+      <form action="https://www.mercerfg.com.au/contact" method="get" class="cta-form max-w-md">
+        <div class="form-row grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <input type="text" name="name" placeholder="Your name" required class="mercer-input px-4 py-2.5 border border-mercer-border rounded-xl focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:border-transparent">
+          <input type="email" name="email" placeholder="Email" required class="mercer-input px-4 py-2.5 border border-mercer-border rounded-xl focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:border-transparent">
         </div>
-        <div class="form-row-single">
-          <input type="tel" name="phone" placeholder="Phone (optional)">
+        <div class="form-row-single mb-4">
+          <input type="tel" name="phone" placeholder="Phone (optional)" class="mercer-input w-full px-4 py-2.5 border border-mercer-border rounded-xl focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:border-transparent">
         </div>
-        <button type="submit" class="btn btn-secondary btn-submit">Get in touch</button>
+        <button type="submit" class="mercer-cta-btn px-6 py-3 bg-black text-white font-semibold rounded-xl border border-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-mercer-sky focus:ring-offset-2 transition-all duration-200">Get in touch</button>
       </form>
     </section>
 
     <section class="disclaimer">
       <p><strong>Disclaimer:</strong> This calculator provides estimates only. Results are for general guidance and should not be relied upon for investment decisions. Always verify with professional advice and detailed feasibility analysis before making acquisition or funding decisions.</p>
+      <p class="mt-2"><strong>Pre-tax basis:</strong> Results are shown on a pre-tax basis. GST and income tax obligations are not included and will substantially impact the final net position.</p>
     </section>
   </div>
 
@@ -589,63 +555,69 @@
         <button type="button" class="help-close" id="helpClose" aria-label="Close help panel">×</button>
       </div>
       <div class="help-content">
-        <h2>Project value &amp; revenue</h2>
-        <p><strong>Current land value</strong><br>
-        The current market value of the land if sold today (before development). Shows if development adds more value than just holding/selling the land. Also used for LTV calculations by lenders.</p>
-        <p><strong>Total as-completed value (GRV)</strong><br>
-        The total value of ALL lots created by the development, including ones you keep. Example: If creating 2 lots worth $3.7M each, GRV = $7.4M (even if you only sell one). Shows total wealth creation, not just cash from sales.</p>
-        <p><strong>Number of lots (in project)</strong><br>
-        Total number of lots or dwellings in your development project. Typical range: 2-50 lots for small-medium developments.</p>
-        <p><strong>Number of units for sale</strong><br>
-        Number of lots you'll actually sell. If keeping some lots (e.g., for rental), enter only the lots you'll sell. Cannot exceed total project lots.</p>
-        <p><strong>Average sale price</strong><br>
-        Your estimated selling price for each lot/dwelling, based on comparable sales and market conditions. Tip: Use conservative estimates.</p>
-        <p><strong>Gross Sales</strong><br>
-        Total revenue from selling lots = Units for Sale × Average Sale Price. This is the cash that pays the bank and covers costs. All costs and profit are deducted from Gross Sales to determine Residual Land Value.</p>
+        <section class="help-section">
+          <h2 class="help-section-header">
+            <span class="help-section-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+            Project Value &amp; Revenue
+          </h2>
+          <div class="help-metric-card"><div class="help-metric-term">Current land value</div><p class="help-metric-desc">The current market value of the land if sold today (before development). Shows if development adds more value than just holding/selling the land. Also used for LTV calculations by lenders.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Total as-completed value (GRV)</div><p class="help-metric-desc">The total value of ALL lots created by the development, including ones you keep. Example: If creating 2 lots worth $3.7M each, GRV = $7.4M (even if you only sell one). Shows total wealth creation, not just cash from sales.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Number of lots (in project)</div><p class="help-metric-tip">Typical range: 2–50 lots for small–medium developments.</p><p class="help-metric-desc">Total number of lots or dwellings in your development project.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Number of units for sale</div><p class="help-metric-desc">Number of lots you'll actually sell. If keeping some lots (e.g., for rental), enter only the lots you'll sell. Cannot exceed total project lots.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Average sale price</div><p class="help-metric-tip">Tip: Use conservative estimates.</p><p class="help-metric-desc">Your estimated selling price for each lot/dwelling, based on comparable sales and market conditions.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Gross Sales</div><p class="help-metric-desc">Total revenue from selling lots = Units for Sale × Average Sale Price. This is the cash that pays the bank and covers costs. All costs and profit are deducted from Gross Sales to determine Residual Land Value.</p></div>
+        </section>
 
-        <h2>Costs</h2>
-        <p><strong>Construction cost</strong><br>
-        All hard costs to complete the development: materials, labor, site works, etc. Typical range: $1,500-$3,500 per m² depending on quality and location.</p>
-        <p><strong>Professional fees</strong><br>
-        Architect, structural engineer, civil engineer, project manager, and other consultants. Industry standard: 6-12% of construction cost.</p>
-        <p><strong>Contingency</strong><br>
-        Reserve fund for cost overruns, variations, and unforeseen issues. Typical range: 5-10% of construction cost. Higher contingency if project is complex or you have less certainty.</p>
-        <p><strong>Sales & marketing</strong><br>
-        Real estate agent commissions, marketing materials, advertising, staging, etc. Typical range: 3-5% of Gross Sales.</p>
-        <p><strong>Other costs</strong><br>
-        Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc. Typical: $20,000-$100,000+ depending on land value and complexity.</p>
+        <section class="help-section">
+          <h2 class="help-section-header">
+            <span class="help-section-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V9l7-4 7 4v11"/><path d="M12 5v15"/></svg></span>
+            Development Costs
+          </h2>
+          <div class="help-metric-card"><div class="help-metric-term">Construction cost</div><p class="help-metric-tip">Typical range: $1,500–$3,500 per m² depending on quality and location.</p><p class="help-metric-desc">All hard costs to complete the development: materials, labor, site works, etc.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Professional fees</div><p class="help-metric-tip">Industry standard: 6–12% of construction cost.</p><p class="help-metric-desc">Architect, structural engineer, civil engineer, project manager, and other consultants.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Contingency</div><p class="help-metric-tip">Typical range: 5–10% of construction cost.</p><p class="help-metric-desc">Reserve fund for cost overruns, variations, and unforeseen issues. Higher contingency if project is complex or you have less certainty.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Sales &amp; marketing</div><p class="help-metric-tip">Typical range: 3–5% of Gross Sales.</p><p class="help-metric-desc">Real estate agent commissions, marketing materials, advertising, staging, etc.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Other costs</div><p class="help-metric-tip">Typical: $20,000–$100,000+ depending on land value and complexity.</p><p class="help-metric-desc">Stamp duty on land purchase, legal/conveyancing fees, council application fees, etc.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Construction amount required (net)</div><p class="help-metric-desc">The actual construction amount you need to borrow (before interest and fees). The calculator determines the total facility size needed to cover this plus interest and establishment fees.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Interest rate</div><p class="help-metric-tip">Typical range: 8–15% p.a. for private development finance.</p><p class="help-metric-desc">Private lender interest rate per annum. Higher rates significantly increase finance costs.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Construction period</div><p class="help-metric-tip">Typical: 6–18 months depending on project size.</p><p class="help-metric-desc">How long construction will take from start to completion. Longer builds = more interest costs.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Facility term</div><p class="help-metric-desc">Total duration of the facility including construction and sales period. Must be ≥ construction period. Longer terms = higher interest costs but more time to sell.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Calculated facility size</div><p class="help-metric-desc">The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% establishment fee.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Finance cost</div><p class="help-metric-desc">Interest calculated on 55% average utilization during construction, then 100% during the tail period. Interest is capitalised monthly (added to principal), so you pay interest on interest.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Establishment Fee (Est.)</div><p class="help-metric-desc">An upfront fee typically charged by private lenders, calculated as a percentage of the total facility limit. While this calculator uses a 3% benchmark as a standard guide for private funding, actual fees can vary (typically ranging from 1.5% to 4%) depending on the specific funder, project risk, and loan structure. This fee is built into the facility calculation (grossed up), ensuring the lender receives their fee while still providing sufficient funds for construction.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Developer margin</div><p class="help-metric-tip">Typical range: 15–25%. Most lenders require minimum 15% margin for finance approval.</p><p class="help-metric-desc">The profit margin you want to achieve as a percentage of total sales (Gross Sales). Higher margin = lower RLV (less you can pay for land).</p></div>
+        </section>
 
-        <h2>Finance Costs</h2>
-        <p><strong>Construction amount required (net)</strong><br>
-        The actual construction amount you need to borrow (before interest and fees). The calculator determines the total facility size needed to cover this plus interest and establishment fees.</p>
-        <p><strong>Interest rate</strong><br>
-        Private lender interest rate per annum. Typical range: 8-15% p.a. for private development finance. Higher rates significantly increase finance costs.</p>
-        <p><strong>Construction period</strong><br>
-        How long construction will take from start to completion. Typical: 6-18 months depending on project size. Longer builds = more interest costs.</p>
-        <p><strong>Facility term</strong><br>
-        Total duration of the facility including construction and sales period. Must be ≥ construction period. Longer terms = higher interest costs but more time to sell.</p>
-        <p><strong>Calculated facility size</strong><br>
-        The total loan amount needed, calculated using a gross-up formula to cover: Net construction funds, Interest reserve (capitalised monthly), and 3% establishment fee.</p>
-        <p><strong>Finance cost</strong><br>
-        Interest calculated on 55% average utilization during construction, then 100% during the tail period. Interest is capitalised monthly (added to principal), so you pay interest on interest.</p>
-        <p><strong>Establishment fee (3%)</strong><br>
-        Upfront fee charged by the lender, calculated as 3% of the total facility limit. This fee is built into the facility calculation (grossed up), so the lender receives their fee while still providing sufficient funds for construction.</p>
+        <section class="help-section">
+          <h2 class="help-section-header">
+            <span class="help-section-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+            Results &amp; Metrics
+          </h2>
+          <div class="help-metric-card"><div class="help-metric-term">Residual Land Value (RLV)</div><p class="help-metric-desc">The maximum amount you should pay for the land to achieve your target profit. Formula: Gross Sales − All Costs − Developer Profit = RLV. If RLV &lt; Current Land Value, the project is unfeasible (better to sell land as-is). If RLV is negative, it shows cash shortfall required.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Development Profit (Project Lift)</div><p class="help-metric-desc">Total value creation = GRV − (Land Value + Construction Cost). Shows the total wealth created by the development project, including lots you keep.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Return on Equity (ROE)</div><p class="help-metric-desc">Return on your land investment = Development Profit ÷ Starting Land Value × 100%. Shows how much return you're getting on your land equity.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Forecast LVR (Loan/GRV)</div><p class="help-metric-tip">Typical: Private lenders may go up to 70–80% LVR on as-completed value.</p><p class="help-metric-desc">Loan to Value Ratio calculated against the total GRV (as-completed value). Lenders assess risk based on completed project value.</p></div>
+          <div class="help-metric-card"><div class="help-metric-term">Loan to Cost (LTC)</div><p class="help-metric-desc">Shows what percentage of total project cost (land + construction) is being financed. Lenders may finance 80–100% of construction costs, but total LTC depends on land equity.</p></div>
+        </section>
 
-        <h2>Profit</h2>
-        <p><strong>Developer margin</strong><br>
-        The profit margin you want to achieve as a percentage of total sales (Gross Sales). Typical range: 15-25%. Most lenders require minimum 15% margin for finance approval. Higher margin = lower RLV (less you can pay for land).</p>
-
-        <h2>Results &amp; Metrics</h2>
-        <p><strong>Residual Land Value (RLV)</strong><br>
-        The maximum amount you should pay for the land to achieve your target profit. Formula: Gross Sales - All Costs - Developer Profit = RLV. If RLV &lt; Current Land Value, the project is unfeasible (better to sell land as-is). If RLV is negative, it shows cash shortfall required.</p>
-        <p><strong>Development Profit (Project Lift)</strong><br>
-        Total value creation = GRV - (Land Value + Construction Cost). Shows the total wealth created by the development project, including lots you keep.</p>
-        <p><strong>Return on Equity (ROE)</strong><br>
-        Return on your land investment = Development Profit / Starting Land Value × 100%. Shows how much return you're getting on your land equity.</p>
-        <p><strong>Forecast LVR (Loan/GRV)</strong><br>
-        Loan to Value Ratio calculated against the total GRV (as-completed value). Lenders assess risk based on completed project value. Typical: Private lenders may go up to 70-80% LVR on as-completed value.</p>
-        <p><strong>Loan to Cost (LTC)</strong><br>
-        Shows what percentage of total project cost (land + construction) is being financed. Lenders may finance 80-100% of construction costs, but total LTC depends on land equity.</p>
+        <section class="help-section">
+          <h2 class="help-section-header">
+            <span class="help-section-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+            Tax Considerations (Not included in this calculation)
+          </h2>
+          <div class="help-metric-card">
+            <div class="help-metric-term">GST</div>
+            <p class="help-metric-desc">This calculator uses "Gross Sales" inclusive of GST. Depending on whether you use the Margin Scheme, GST can reduce your net profit by roughly 1/11th of the value uplift.</p>
+          </div>
+          <div class="help-metric-card">
+            <div class="help-metric-term">Income Tax / CGT</div>
+            <p class="help-metric-desc">Development profits are generally treated as ordinary income. You should consult an accountant to understand the tax impact based on your specific entity structure (Company, Trust, or Individual).</p>
+          </div>
+          <div class="help-metric-card">
+            <div class="help-metric-term">Land Tax</div>
+            <p class="help-metric-desc">Holding costs for land can increase significantly during the construction period and are not explicitly modeled here.</p>
+          </div>
+        </section>
       </div>
     </div>
   </div>
