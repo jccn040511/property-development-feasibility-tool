@@ -1675,9 +1675,14 @@ input[type="number"] {
     padding: 1.5rem 0 !important;
   }
 
+  /* Give more usable width to main content on small screens */
+  .main {
+    padding: 1rem 0.75rem;
+  }
+
   .header {
     margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    padding: 0 1rem 1.5rem;
   }
 
   .header-content {
@@ -1701,7 +1706,7 @@ input[type="number"] {
   }
 
   .card {
-    padding: 1.5rem 0 !important;
+    padding: 1.25rem 0.75rem !important;
   }
 
   .inputs-section.card > h2,
