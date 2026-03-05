@@ -21,7 +21,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=6">
   <style>
     /* Value inputs: 200px width; align-self stops stretch when parent is flex column (mobile) */
     .input-row input.input-value {
@@ -32,10 +32,44 @@
       max-width: 200px !important;
       box-sizing: border-box !important;
     }
+    /* Force cards to use full width (override Tailwind px-4/px-5/px-6) */
+    .app {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .inputs-section.card,
+    .results-section.card {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .inputs-section.card > h2,
+    .results-section.card > h2 {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      border-radius: 0 !important;
+    }
+    /* Force inner padding so text isn’t flush to card edges */
+    .breakdown.card-inner,
+    .settlement-position.card-inner,
+    .sensitivity.card-inner {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+    }
+    .breakdown-table td,
+    .breakdown-table th,
+    .sensitivity-table td,
+    .sensitivity-table th {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+    }
+    .settlement-item {
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
+    }
   </style>
 </head>
 <body class="font-sans antialiased bg-white text-black">
-  <div class="app max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-6 py-8">
+  <div class="app max-w-[1400px] mx-auto py-8">
     <header class="header border-b-2 border-black mb-10 pb-8">
       <div class="header-content flex flex-wrap items-center gap-8">
         <div class="flex-shrink-0">
@@ -748,5 +782,23 @@
       }
     })();
   </script>
+  <!-- Load last so these overrides beat Tailwind -->
+  <style id="card-width-overrides">
+    .app { padding-left: 0 !important; padding-right: 0 !important; }
+    .results-section.card { padding-left: 0 !important; padding-right: 0 !important; }
+    .inputs-section.card { padding-left: 1.25rem !important; padding-right: 1.25rem !important; padding-top: 1rem !important; padding-bottom: 1.25rem !important; }
+    .inputs-section.card > h2 { margin-left: -1.25rem !important; margin-right: -1.25rem !important; }
+    .results-section.card > h2 { margin-left: 0 !important; margin-right: 0 !important; }
+    .breakdown.card-inner, .settlement-position.card-inner, .sensitivity.card-inner { padding-left: 1rem !important; padding-right: 1rem !important; box-sizing: border-box !important; min-width: 0 !important; }
+    .breakdown-table td, .breakdown-table th, .sensitivity-table td, .sensitivity-table th { padding-left: 1rem !important; padding-right: 1rem !important; box-sizing: border-box !important; }
+    .settlement-item { padding-left: 1rem !important; padding-right: 1rem !important; }
+    /* Keep tables inside card: fixed layout so RLV column stays in bounds */
+    .breakdown-table, .sensitivity-table { table-layout: fixed !important; width: 100% !important; max-width: 100% !important; }
+    .breakdown-table td:first-child, .breakdown-table th:first-child { width: 58% !important; min-width: 0 !important; }
+    .breakdown-table td:last-child, .breakdown-table th:last-child { width: 42% !important; min-width: 0 !important; }
+    .sensitivity-table th:first-child, .sensitivity-table td:first-child { width: 28% !important; min-width: 0 !important; }
+    .sensitivity-table th:nth-child(2), .sensitivity-table td:nth-child(2) { width: 36% !important; min-width: 0 !important; }
+    .sensitivity-table th:last-child, .sensitivity-table td:last-child { width: 36% !important; min-width: 0 !important; }
+  </style>
 </body>
 </html>
